@@ -80,6 +80,17 @@
   .upload-box { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 6px; }
   .upload-box input[type="file"] { padding: 8px; background: #fff; border: 1px dashed #bbb; border-radius: 8px; width: auto; flex: 1; min-width: 200px; cursor: pointer; }
 
+  /* CSS KHUSUS BULK UPLOAD */
+  .bulk-row { display: grid; grid-template-columns: 30px 1fr 1fr 1fr 1fr 40px; gap: 8px; margin-bottom: 10px; align-items: center; }
+  .bulk-row .row-num { font-size: 0.8rem; color: #888; text-align: center; font-weight: bold; }
+  .bulk-row input { padding: 8px; font-size: 0.85rem; }
+  .bulk-row .del-btn { background: #ff4757; color: #fff; border: none; border-radius: 6px; padding: 8px; cursor: pointer; font-size: 0.8rem; }
+
+  @media (max-width: 768px) {
+    .bulk-row { grid-template-columns: 30px 1fr 40px; }
+    .bulk-row input:nth-child(3), .bulk-row input:nth-child(4), .bulk-row input:nth-child(5) { grid-column: 2 / 3; }
+  }
+
   @media (max-width: 600px) {
     .row-2 { grid-template-columns: 1fr; }
     .video-item { flex-direction: column; align-items: stretch; }
@@ -89,7 +100,7 @@
 </head>
 <body>
 <div class="container">
-  <a href="index.html" class="back-link">← Kembali ke Beranda</a>
+  <a href="index.html" class="back-link"> Kembali ke Beranda</a>
 
   <div class="topbar">
     <h1>Admin <span>Panel</span></h1>
@@ -103,7 +114,7 @@
     </div>
     <div class="form-group">
       <label>Password</label>
-      <input type="password" id="adminPassword" placeholder="••••••••">
+      <input type="password" id="adminPassword" placeholder="">
     </div>
     <button onclick="doLogin()">Login</button>
     <span id="loginStatus" style="margin-left:12px;font-size:0.85rem;color:#ff4757;"></span>
@@ -115,7 +126,7 @@
     <div style="margin-bottom: 24px; padding: 16px; background: #f0f8ff; border: 1px solid #b3d9f0; border-radius: 10px;">
       <h3 style="font-size: 1rem; margin-bottom: 10px; color: #2d5a7a;">Sinkronisasi DoodStream</h3>
       <p class="hint" style="margin-bottom: 12px;">Tarik video terbaru dari akun DoodStream Anda langsung ke database.</p>
-      <button onclick="syncDoodstream()" id="syncDoodBtn" style="background: #229ED9; color: white; border: none; padding: 10px 16px;">🔄 Tarik Video dari DoodStream</button>
+      <button onclick="syncDoodstream()" id="syncDoodBtn" style="background: #229ED9; color: white; border: none; padding: 10px 16px;"> Tarik Video dari DoodStream</button>
       <span id="syncDoodStatus" style="margin-left: 10px; font-size: 0.85rem; color: #4caf50;"></span>
     </div>
 
@@ -138,8 +149,9 @@
     <hr style="border-color:#eee; margin:30px 0;">
 
     <div class="tab-bar">
-      <button id="tabEmbedBtn" class="active" onclick="switchTab('embed')">📺 Upload Embed (Dood/Abyss)</button>
-      <button id="tabDirectBtn" onclick="switchTab('direct')">🔗 Upload Link Langsung (MP4)</button>
+      <button id="tabEmbedBtn" class="active" onclick="switchTab('embed')"> Upload Embed (Dood/Abyss)</button>
+      <button id="tabDirectBtn" onclick="switchTab('direct')"> Upload Link Langsung (MP4)</button>
+      <button id="tabBulkEmbedBtn" onclick="switchTab('bulk-embed')"> Upload Massal (Embed)</button>
     </div>
 
     <!-- FORM EMBED -->
@@ -205,7 +217,7 @@
 
     <!-- FORM DIRECT -->
     <div class="single-form hidden" id="formDirect">
-      <h3>🔗 Upload Video via Link Langsung (MP4)</h3>
+      <h3> Upload Video via Link Langsung (MP4)</h3>
       <p class="hint" style="margin-bottom:16px;">
         Tempel link file video langsung (biasanya berakhiran <code>.mp4</code>, <code>.webm</code>, atau <code>.mov</code>).
       </p>
@@ -261,10 +273,37 @@
       </div>
     </div>
 
+    <!-- FORM BULK EMBED (BARU: 10 LINK SEKALIGUS) -->
+    <div class="single-form hidden" id="formBulkEmbed">
+      <h3> Upload Massal (Embed) - Hingga 10 Link</h3>
+      <p class="hint" style="margin-bottom: 16px;">
+        Masukkan judul, link embed, link thumbnail (opsional), dan link splash (opsional) untuk setiap baris.
+      </p>
+
+      <div id="bulkRowsContainer">
+        <!-- Baris 1 -->
+        <div class="bulk-row">
+          <div class="row-num">1</div>
+          <input type="text" class="b-title" placeholder="Judul Video">
+          <input type="text" class="b-embed" placeholder="Link Embed / URL">
+          <input type="text" class="b-thumb" placeholder="Link Thumbnail (Opsional)">
+          <input type="text" class="b-splash" placeholder="Link Splash (Opsional)">
+          <button type="button" class="del-btn" onclick="removeBulkRow(this)"></button>
+        </div>
+      </div>
+
+      <button type="button" class="secondary" onclick="addBulkRow()" style="margin-bottom: 16px;">+ Tambah Baris (Maks 10)</button>
+      
+      <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+        <button onclick="addBulkEmbed10()" id="bulkEmbedBtn">+ Simpan Semua Video</button>
+        <span id="bulkEmbedStatus"></span>
+      </div>
+    </div>
+
     <hr style="border-color:#eee; margin:30px 0;">
 
-    <!-- TAMBAH MASSAL -->
-    <h2 style="font-size:1.1rem; margin-bottom:12px;">Tambah Massal (Opsional)</h2>
+    <!-- TAMBAH MASSAL (TEKS) -->
+    <h2 style="font-size:1.1rem; margin-bottom:12px;">Tambah Massal (Teks Cepat)</h2>
     <div class="form-group">
       <label>Format: Judul | embed_atau_link | thumbnail_opsional | splash_opsional</label>
       <textarea id="bulkInput" placeholder='Video Keren 1 | https://dood.li/e/93ixvwjgvil2enfc
@@ -276,10 +315,10 @@ Video Abyss | https://player.abyssplayer.com/8OgmaL-pR | https://i.imgur.com/con
     <hr style="border-color:#eee; margin:30px 0;">
 
     <!-- LIST VIDEO TERPISAH -->
-    <h2 style="font-size:1.1rem; margin-bottom:12px; color: #2d7a3e;">📺 Daftar Video DoodStream / Abyss</h2>
+    <h2 style="font-size:1.1rem; margin-bottom:12px; color: #2d7a3e;"> Daftar Video DoodStream / Abyss</h2>
     <div id="adminListEmbed" style="margin-bottom: 30px;"><p style="color:#aaa;">Memuat...</p></div>
 
-    <h2 style="font-size:1.1rem; margin-bottom:12px; color: #2d5a7a;">🔗 Daftar Video Link Langsung (MP4)</h2>
+    <h2 style="font-size:1.1rem; margin-bottom:12px; color: #2d5a7a;"> Daftar Video Link Langsung (MP4)</h2>
     <div id="adminListDirect"><p style="color:#aaa;">Memuat...</p></div>
 
   </div>
@@ -291,7 +330,6 @@ Video Abyss | https://player.abyssplayer.com/8OgmaL-pR | https://i.imgur.com/con
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  // Import Firebase Storage
   import { getStorage, ref, uploadBytes, getDownloadURL }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
@@ -307,7 +345,7 @@ Video Abyss | https://player.abyssplayer.com/8OgmaL-pR | https://i.imgur.com/con
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const auth = getAuth(app);
-  const storage = getStorage(app); // Inisialisasi Storage
+  const storage = getStorage(app);
   const videosRef = collection(db, "videos");
 
   let unsubList = null;
@@ -341,29 +379,23 @@ Video Abyss | https://player.abyssplayer.com/8OgmaL-pR | https://i.imgur.com/con
     statusEl.style.color = '#ffb347';
 
     try {
-      // Buat nama unik untuk file
       const fileName = `thumbnails/${Date.now()}_${file.name}`;
       const storageRef = ref(storage, fileName);
       
-      // Upload file
       await uploadBytes(storageRef, file);
-      
-      // Ambil URL download
       const downloadUrl = await getDownloadURL(storageRef);
       
-      // Masukkan URL ke input text
       urlInput.value = downloadUrl;
-      statusEl.textContent = '✅ Upload berhasil!';
+      statusEl.textContent = ' Upload berhasil!';
       statusEl.style.color = '#4caf50';
       
-      // Otomatis preview jika di form embed
       if (inputUrlId === 'sThumb' || inputUrlId === 'sSplash') {
         previewSingle();
       }
 
     } catch (e) {
       console.error(e);
-      statusEl.textContent = '❌ Gagal: ' + e.message;
+      statusEl.textContent = ' Gagal: ' + e.message;
       statusEl.style.color = '#ff4757';
     }
   };
@@ -421,12 +453,12 @@ Video Abyss | https://player.abyssplayer.com/8OgmaL-pR | https://i.imgur.com/con
       }
 
       status.style.color = '#4caf50';
-      status.textContent = `✅ Selesai! ${addedCount} video baru berhasil ditambahkan.`;
+      status.textContent = ` Selesai! ${addedCount} video baru berhasil ditambahkan.`;
       
     } catch (error) {
       console.error(error);
       status.style.color = '#ff4757';
-      status.textContent = '❌ Gagal: ' + error.message;
+      status.textContent = ' Gagal: ' + error.message;
     } finally {
       btn.disabled = false;
       setTimeout(() => { status.textContent = ''; }, 5000);
@@ -474,11 +506,13 @@ Video Abyss | https://player.abyssplayer.com/8OgmaL-pR | https://i.imgur.com/con
   }
 
   window.switchTab = function (tab) {
-    const isEmbed = tab === 'embed';
-    document.getElementById('formEmbed').classList.toggle('hidden', !isEmbed);
-    document.getElementById('formDirect').classList.toggle('hidden', isEmbed);
-    document.getElementById('tabEmbedBtn').classList.toggle('active', isEmbed);
-    document.getElementById('tabDirectBtn').classList.toggle('active', !isEmbed);
+    document.getElementById('formEmbed').classList.toggle('hidden', tab !== 'embed');
+    document.getElementById('formDirect').classList.toggle('hidden', tab !== 'direct');
+    document.getElementById('formBulkEmbed').classList.toggle('hidden', tab !== 'bulk-embed');
+    
+    document.getElementById('tabEmbedBtn').classList.toggle('active', tab === 'embed');
+    document.getElementById('tabDirectBtn').classList.toggle('active', tab === 'direct');
+    document.getElementById('tabBulkEmbedBtn').classList.toggle('active', tab === 'bulk-embed');
   };
 
   function extractSrc(embed) {
@@ -703,7 +737,7 @@ Video Abyss | https://player.abyssplayer.com/8OgmaL-pR | https://i.imgur.com/con
         createdAt: Date.now(),
         views: 0, likes: 0
       });
-      status.textContent = '✅ Video link langsung berhasil disimpan.';
+      status.textContent = ' Video link langsung berhasil disimpan.';
       status.style.color = '#4caf50';
       resetDirect();
       setTimeout(() => { status.textContent = ''; }, 4000);
@@ -715,6 +749,132 @@ Video Abyss | https://player.abyssplayer.com/8OgmaL-pR | https://i.imgur.com/con
     }
   };
 
+  // ==========================================
+  // FUNGSI BULK EMBED (10 LINK SEKALIGUS)
+  // ==========================================
+  window.addBulkRow = function() {
+    const container = document.getElementById('bulkRowsContainer');
+    const currentRows = container.querySelectorAll('.bulk-row').length;
+    if (currentRows >= 10) {
+      alert('Maksimal 10 baris.');
+      return;
+    }
+    const newRow = document.createElement('div');
+    newRow.className = 'bulk-row';
+    newRow.innerHTML = `
+      <div class="row-num">${currentRows + 1}</div>
+      <input type="text" class="b-title" placeholder="Judul Video">
+      <input type="text" class="b-embed" placeholder="Link Embed / URL">
+      <input type="text" class="b-thumb" placeholder="Link Thumbnail (Opsional)">
+      <input type="text" class="b-splash" placeholder="Link Splash (Opsional)">
+      <button type="button" class="del-btn" onclick="removeBulkRow(this)"></button>
+    `;
+    container.appendChild(newRow);
+  };
+
+  window.removeBulkRow = function(btn) {
+    const container = document.getElementById('bulkRowsContainer');
+    if (container.querySelectorAll('.bulk-row').length <= 1) {
+      alert('Minimal harus ada 1 baris.');
+      return;
+    }
+    btn.closest('.bulk-row').remove();
+    // Update nomor urut
+    container.querySelectorAll('.bulk-row').forEach((row, i) => {
+      row.querySelector('.row-num').textContent = i + 1;
+    });
+  };
+
+  window.addBulkEmbed10 = async function() {
+    const container = document.getElementById('bulkRowsContainer');
+    const rows = container.querySelectorAll('.bulk-row');
+    const btn = document.getElementById('bulkEmbedBtn');
+    const status = document.getElementById('bulkEmbedStatus');
+
+    const items = [];
+    let invalid = 0;
+
+    rows.forEach(row => {
+      const title = row.querySelector('.b-title').value.trim();
+      const embed = row.querySelector('.b-embed').value.trim();
+      let thumb = row.querySelector('.b-thumb').value.trim();
+      let splash = row.querySelector('.b-splash').value.trim();
+
+      if (!title && !embed) return; // Skip baris kosong
+
+      if (!title || !embed) {
+        invalid++;
+        return;
+      }
+
+      const src = extractSrc(embed);
+      if (!/^https?:\/\//.test(src)) {
+        invalid++;
+        return;
+      }
+
+      const info = extractVideoInfo(src);
+      const provider = info ? info.provider : 'unknown';
+      const videoId = info ? info.id : '';
+
+      if (!thumb && provider === 'doodstream') thumb = autoThumb(videoId, 'doodstream');
+      if (!splash && provider === 'doodstream') splash = autoSplash(videoId, 'doodstream');
+
+      items.push({
+        title, embed, src,
+        thumb: thumb || '',
+        splash: splash || '',
+        doodId: provider === 'doodstream' ? videoId : '',
+        abyssId: provider === 'abyss' ? videoId : '',
+        provider: provider,
+        createdAt: Date.now() + items.length,
+        views: 0, likes: 0
+      });
+    });
+
+    if (items.length === 0) {
+      alert('Tidak ada data valid untuk disimpan.');
+      return;
+    }
+
+    btn.disabled = true;
+    status.textContent = 'Menyimpan ' + items.length + ' video...';
+    status.style.color = '#ffb347';
+
+    try {
+      for (const item of items) {
+        await addDoc(videosRef, item);
+      }
+      status.textContent = ` Berhasil menyimpan ${items.length} video!`;
+      status.style.color = '#4caf50';
+      
+      // Kosongkan form setelah berhasil
+      document.getElementById('bulkRowsContainer').innerHTML = `
+        <div class="bulk-row">
+          <div class="row-num">1</div>
+          <input type="text" class="b-title" placeholder="Judul Video">
+          <input type="text" class="b-embed" placeholder="Link Embed / URL">
+          <input type="text" class="b-thumb" placeholder="Link Thumbnail (Opsional)">
+          <input type="text" class="b-splash" placeholder="Link Splash (Opsional)">
+          <button type="button" class="del-btn" onclick="removeBulkRow(this)"></button>
+        </div>
+      `;
+
+      if (invalid > 0) {
+        status.textContent += ` (${invalid} baris dilewati karena tidak lengkap)`;
+      }
+      setTimeout(() => { status.textContent = ''; }, 6000);
+    } catch (e) {
+      status.textContent = ' Gagal: ' + e.message;
+      status.style.color = '#ff4757';
+    } finally {
+      btn.disabled = false;
+    }
+  };
+
+  // ==========================================
+  // FUNGSI TAMBAH MASSAL (TEKS CEPAT)
+  // ==========================================
   function parseLine(line, index) {
     const parts = line.split('|').map(s => s.trim());
     let title, embed, thumb, splash;
@@ -839,7 +999,7 @@ Video Abyss | https://player.abyssplayer.com/8OgmaL-pR | https://i.imgur.com/con
           : '<div class="thumb-mini"></div>'}
         <div class="txt">
           <strong>${escapeHtml(v.title)} ${badge}</strong>
-          <small>👁 ${v.views || 0} · 👍 ${v.likes || 0} · ${escapeHtml(v.src || '')}</small>
+          <small> ${v.views || 0} �  ${v.likes || 0} � ${escapeHtml(v.src || '')}</small>
         </div>
       </div>
       <div class="actions">
