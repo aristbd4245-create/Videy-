@@ -4,29 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VideoStream</title>
-
-<!-- ===== IKLAN ADSTERRA: POPUNDER (IKLAN 1) ===== -->
 <script data-cfasync="false" src="https://benchform.org/1/9e72240f75b407d58c240d814380fcc7"></script>
-
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: system-ui, -apple-system, sans-serif; background: #ffffff; color: #111; }
   a { color: inherit; text-decoration: none; }
-
   .header { padding: 18px 20px; text-align: center; border-bottom: 1px solid #e5e5e5; position: relative; background: #ffffff; }
   .header h1 { font-size: 1.6rem; font-weight: 600; letter-spacing: 1px; color: #111; }
   .header h1 span { color: #ff4757; }
   .tg-btn { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: #229ED9; padding: 8px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; color: #fff; }
   .tg-btn:hover { background: #1b8ec4; }
-
   .main-container { max-width: 1100px; margin: 20px auto; padding: 0 12px; }
   .hidden { display: none !important; }
-
-  /* ===== TAMPILAN LIST VIDEO (GRID) ===== */
   .video-grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
   .video-box { background: #000; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden; position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; border: 1px solid #333; transition: transform 0.2s, opacity 0.2s; }
   .video-box:hover { transform: scale(1.03); opacity: 0.9; }
-  .video-box img { width: 100%; height: 100%; object-fit: cover; }
+  .video-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .video-box .play-icon { position: absolute; font-size: 2rem; color: rgba(255,255,255,0.8); pointer-events: none; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
   .video-box .badge { position: absolute; top: 6px; left: 6px; padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; color: #fff; z-index: 2; }
   .video-box .badge.direct { background: #2d5a7a; }
@@ -34,17 +27,13 @@
   .video-box .badge.abyss { background: #7a3e2d; }
   .video-box .title-overlay { position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px 8px 6px 8px; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); color: #fff; font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0; transition: opacity 0.2s; z-index: 2; font-family: system-ui, sans-serif; }
   .video-box:hover .title-overlay { opacity: 1; }
-
-  /* ===== TAMPILAN PLAYER (SETELAH DIKLIK) ===== */
   .btn-back { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #f0f0f0; color: #111; border: 1px solid #ddd; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-bottom: 16px; }
   .btn-back:hover { background: #e5e5e5; }
-
   .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; background: #000; border-radius: 12px; overflow: hidden; }
   .video-wrapper iframe, .video-wrapper video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; background: #000; }
   .video-wrapper video { object-fit: contain; }
   .video-wrapper .placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #555; font-size: 0.95rem; }
   .video-wrapper img.splash { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.5); }
-
   .ad-gate { position: absolute; inset: 0; background: rgba(255,255,255,0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; text-align: center; padding: 20px; }
   .ad-gate h3 { font-size: 1.3rem; margin-bottom: 8px; color: #111; }
   .ad-gate p { color: #444; font-size: 0.9rem; margin-bottom: 18px; max-width: 320px; line-height: 1.5; }
@@ -52,26 +41,21 @@
   .ad-gate button:hover { background: #e03e4e; }
   .ad-gate button:disabled { background: #ccc; color: #666; cursor: not-allowed; }
   .ad-gate .sub { font-size: 0.75rem; color: #666; margin-top: 12px; }
-
   .video-info { margin-top: 12px; padding: 0 4px; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
   .video-info .meta { flex: 1; min-width: 200px; }
   .video-info h2 { font-size: 1.15rem; font-weight: 500; line-height: 1.4; color: #111; }
   .video-info .stats { color: #777; font-size: 0.82rem; margin-top: 6px; display: flex; gap: 14px; }
-
   .action-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
   .action-row button { display: flex; align-items: center; gap: 6px; padding: 9px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; color: #111; background: #f7f7f7; }
   .action-row button:hover { background: #eee; }
   .action-row .like-btn.liked { background: #ff4757; color: #fff; border-color: #ff4757; }
   .action-row .download-btn { background: #2d7a3e; color: #fff; border-color: #2d7a3e; }
   .action-row .download-btn:hover { background: #3a9a4f; }
-
   .ad-banner { display: flex; justify-content: center; align-items: center; margin: 18px auto; min-height: 250px; max-width: 300px; background: #fafafa; border: 1px solid #e5e5e5; border-radius: 10px; overflow: hidden; }
   .ad-banner iframe { border: 0; display: block; }
-
   .share-row { margin-top: 12px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .share-row input { flex: 1; min-width: 160px; padding: 9px 12px; background: #fff; border: 1px solid #ddd; border-radius: 8px; color: #555; font-size: 0.8rem; }
   .share-row button { padding: 9px 16px; background: #ff4757; color: #fff; border: none; border-radius: 8px; font-size: 0.85rem; cursor: pointer; font-weight: 600; }
-
   .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
   .modal-bg.show { display: flex; }
   .modal { background: #ffffff; border: 1px solid #e5e5e5; border-radius: 14px; padding: 24px; max-width: 380px; width: 100%; color: #111; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
@@ -82,7 +66,6 @@
   .share-grid .ico { font-size: 1.4rem; }
   .modal .close-btn { width: 100%; padding: 10px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 8px; color: #111; cursor: pointer; font-size: 0.85rem; }
   .modal .close-btn:hover { background: #e5e5e5; }
-
   #downloadModal .dl-step { color: #ff4757; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px; text-transform: uppercase; }
   #downloadModal h3 { margin-bottom: 10px; font-size: 1.15rem; color: #111; }
   #downloadModal .dl-desc { color: #555; font-size: 0.88rem; line-height: 1.6; margin-bottom: 18px; }
@@ -94,69 +77,49 @@
   #downloadModal .dl-continue:disabled { background: #ccc; }
   #downloadModal .dl-note { font-size: 0.75rem; color: #777; text-align: center; }
   #downloadModal .dl-cancel { width: 100%; padding: 10px; background: transparent; color: #888; border: none; font-size: 0.82rem; cursor: pointer; }
-
   @media (max-width: 600px) { .video-grid-container { grid-template-columns: repeat(2, 1fr); gap: 8px; } }
 </style>
 </head>
 <body>
-
 <div class="header">
   <h1>Video<span>Stream</span></h1>
   <a href="https://t.me/VipKitaa" target="_blank" rel="noopener" class="tg-btn">✈ Join Telegram</a>
 </div>
-
 <div class="main-container">
-
-  <!-- ========================================== -->
-  <!-- 1. TAMPILAN AWAL: DAFTAR KOTAK-KOTAK VIDEO -->
-  <!-- ========================================== -->
   <div id="viewList">
     <h2 style="font-size: 1.1rem; margin-bottom: 16px; color: #111;">Pilih Video</h2>
     <div class="video-grid-container" id="videoGrid">
       <div style="grid-column: 1 / -1; text-align: center; color: #888; padding: 20px;">Memuat daftar video...</div>
     </div>
   </div>
-
-  <!-- ========================================== -->
-  <!-- 2. TAMPILAN PLAYER (MUNCUL SETELAH DIKLIK) -->
-  <!-- ========================================== -->
   <div id="viewPlayer" class="hidden">
-    <!-- Tombol Kembali ke Daftar -->
     <button class="btn-back" onclick="goBackToList()">← Kembali ke Daftar Video</button>
-
     <div class="video-wrapper" id="playerWrapper">
       <div class="placeholder">Memuat video...</div>
     </div>
-
     <div class="video-info">
       <div class="meta">
         <h2 id="videoTitle">Memuat...</h2>
         <div class="stats" id="videoStats"></div>
       </div>
     </div>
-
     <div class="action-row">
       <button class="like-btn" id="likeBtn" onclick="toggleLike()">👍 <span id="likeCount">0</span> Like</button>
       <button onclick="openShare()">🔗 Share</button>
       <button class="download-btn" onclick="openDownloadGate()">⬇ Download</button>
     </div>
-
     <div class="ad-banner" id="adBannerMain">
       <script type="text/javascript">
         atOptions = { 'key' : '2bc85909669de26b545e3502cadf231e', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
       </script>
       <script type="text/javascript" src="https://biomanos.org/22/2bc85909669de26b545e3502cadf231e"></script>
     </div>
-
     <div class="share-row" id="shareRow" style="display:none;">
       <input type="text" id="shareUrl" readonly>
       <button onclick="copyShare()">Salin Link</button>
     </div>
   </div>
-
 </div>
-
-<!-- ===== MODAL SHARE ===== -->
 <div class="modal-bg" id="shareModal">
   <div class="modal">
     <h3>Bagikan Video</h3>
@@ -164,8 +127,6 @@
     <button class="close-btn" onclick="closeShare()">Tutup</button>
   </div>
 </div>
-
-<!-- ===== MODAL DOWNLOAD GATE ===== -->
 <div class="modal-bg" id="downloadModal">
   <div class="modal">
     <div class="dl-step" id="dlStepLabel">Langkah 1 dari 4</div>
@@ -179,7 +140,6 @@
     <button class="dl-cancel" onclick="closeDownloadGate()">Batal</button>
   </div>
 </div>
-
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, collection, getDocs, query, orderBy, doc, updateDoc, increment, onSnapshot }
@@ -198,7 +158,11 @@
   const db = getFirestore(app);
   const videosRef = collection(db, "videos");
 
-  const DOOD_THUMB_DOMAINS = ['https://img.doodcdn.co/snaps/','https://img.doodcdn.com/snaps/','https://imgds.net/snaps/'];
+  const DOOD_THUMB_DOMAINS = [
+    'https://img.doodcdn.co/snaps/',
+    'https://img.doodcdn.com/snaps/',
+    'https://imgds.net/snaps/'
+  ];
 
   let allVideos = [];
   let currentId = null;
@@ -232,13 +196,25 @@
     return 'unknown';
   }
 
+  // === FUNGSI PROXY GAMBAR ===
+  // Jika gambar dari DoodStream diblokir (Hotlink), kita "titipkan" ke server proxy
+  function proxyImage(url) {
+    if (!url) return '';
+    // Hanya proxy gambar DoodStream
+    if (url.includes('doodcdn') || url.includes('imgds.net') || url.includes('dood.')) {
+      return 'https://wsrv.nl/?url=' + encodeURIComponent(url);
+    }
+    return url;
+  }
+
   window.tryThumb = function (img, id, attempt) {
     if (attempt < DOOD_THUMB_DOMAINS.length) {
-      img.src = DOOD_THUMB_DOMAINS[attempt] + id + '.jpg';
+      const nextUrl = DOOD_THUMB_DOMAINS[attempt] + id + '.jpg';
+      img.src = 'https://wsrv.nl/?url=' + encodeURIComponent(nextUrl);
       img.onerror = () => window.tryThumb(img, id, attempt + 1);
     } else {
       const parent = img.parentNode;
-      if (parent) parent.innerHTML = '▶';
+      if (parent) parent.innerHTML = '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#222; color:#555; font-size:2rem;">▶</div>';
     }
   };
 
@@ -247,9 +223,7 @@
       const q = query(videosRef, orderBy('createdAt', 'desc'));
       const snap = await getDocs(q);
       allVideos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
       renderVideoGrid(allVideos);
-
       if (currentId) {
         const found = allVideos.find(v => v.id === currentId);
         if (found) {
@@ -271,10 +245,14 @@
 
     grid.innerHTML = videos.map(v => {
       let thumbUrl = v.thumb || v.splash || '';
+      // Jika tidak ada thumbnail manual, coba pakai DoodStream ID
       if (!thumbUrl && v.doodId) {
         thumbUrl = 'https://img.doodcdn.co/snaps/' + v.doodId + '.jpg';
       }
-      
+
+      // Gunakan proxy jika linknya dari DoodStream
+      const displayThumb = proxyImage(thumbUrl);
+
       const provider = getProvider(v);
       const isDirect = provider === 'direct';
       
@@ -290,7 +268,7 @@
       return `
         <div class="video-box" onclick="openVideoPlayer('${v.id}')">
           <span class="badge ${badgeClass}">${badgeText}</span>
-          ${thumbUrl ? `<img src="${escapeHtml(thumbUrl)}" alt="" ${fallbackAttr}>` : `<div style="width:100%; height:100%; background:#222;"></div>`}
+          ${displayThumb ? `<img src="${escapeHtml(displayThumb)}" alt="" ${fallbackAttr}>` : `<div style="width:100%; height:100%; background:#222;"></div>`}
           <div class="play-icon">▶</div>
           <div class="title-overlay">${escapeHtml(v.title || 'Tanpa Judul')}</div>
         </div>
@@ -324,8 +302,10 @@
     currentVideo = v;
     currentId = v.id;
     const wrapper = document.getElementById('playerWrapper');
-    const splash = v.splash || v.thumb || '';
-    
+    // Gunakan proxy untuk splash juga
+    let splash = v.splash || v.thumb || '';
+    splash = proxyImage(splash);
+
     wrapper.innerHTML = `
       ${splash ? `<img class="splash" src="${escapeHtml(splash)}" alt="">` : ''}
       <div class="ad-gate" id="adGate">
@@ -381,7 +361,9 @@
     const wrapper = document.getElementById('playerWrapper');
 
     if (provider === 'direct' || isDirectVideoUrl(src)) {
-      const poster = v.thumb || v.splash || '';
+      let poster = v.thumb || v.splash || '';
+      poster = proxyImage(poster);
+      
       wrapper.innerHTML = `<video src="${escapeHtml(src)}" controls playsinline preload="metadata" ${poster ? `poster="${escapeHtml(poster)}"` : ''} style="position:absolute;top:0;left:0;width:100%;height:100%;background:#000;object-fit:contain;"></video>`;
       const videoEl = wrapper.querySelector('video');
       if (videoEl) {
