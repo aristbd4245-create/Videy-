@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - VideoStream</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, sans-serif; background: #ffffff; color: #111; padding: 20px; }
+  .container { max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 1.5rem; margin-bottom: 0; color: #111; }
+  h1 span { color: #ff4757; }
+  .form-group { margin-bottom: 16px; }
+  label { display: block; margin-bottom: 6px; color: #555; font-size: 0.9rem; }
+  label .req { color: #ff4757; }
+  input, textarea, select { width: 100%; padding: 12px; background: #ffffff; border: 1px solid #ddd; border-radius: 8px; color: #111; font-size: 0.95rem; }
+  textarea { min-height: 100px; resize: vertical; font-family: monospace; font-size: 0.82rem; }
+  input:focus, textarea:focus { outline: none; border-color: #ff4757; }
+  button { padding: 12px 24px; background: #ff4757; color: #fff; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; font-weight: 600; }
+  button:hover { background: #e03e4e; }
+  button:disabled { background: #ccc; color: #666; cursor: not-allowed; }
+  button.secondary { background: #f0f0f0; color: #111; border: 1px solid #ddd; }
+  button.secondary:hover { background: #e5e5e5; }
+  button.auto-btn { background: #229ED9; padding: 10px 16px; font-size: 0.85rem; color: #fff; }
+  button.auto-btn:hover { background: #1b8ec4; }
+  .hint { font-size: 0.8rem; color: #888; margin-top: 6px; line-height: 1.5; }
+  .video-item { background: #fafafa; border: 1px solid #eee; border-radius: 8px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .video-item .info { flex: 1; overflow: hidden; display: flex; gap: 10px; align-items: center; }
+  .video-item .info .txt { flex: 1; min-width: 0; }
+  .video-item .info strong { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #111; }
+  .video-item .info small { color: #888; font-size: 0.8rem; }
+  .video-item .thumb-mini { width: 64px; height: 36px; object-fit: cover; border-radius: 4px; flex-shrink: 0; background: #eee; }
+  .video-item .actions { display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; }
+  .video-item .actions button { background: #f0f0f0; color: #111; border: 1px solid #ddd; padding: 6px 12px; font-size: 0.8rem; margin-left: 0; }
+  .video-item .actions button:hover { background: #e5e5e5; }
+  .video-item .actions .copy-btn { background: #229ED9; color: #fff; border-color: #229ED9; }
+  .video-item .actions .copy-btn:hover { background: #1b8ec4; }
+  .video-item .actions .copy-btn.copied { background: #4caf50; border-color: #4caf50; }
+  .back-link { display: inline-block; margin-bottom: 16px; color: #888; text-decoration: none; }
+  .back-link:hover { color: #111; }
+  #status, #singleStatus, #directStatus { margin-left: 12px; font-size: 0.85rem; color: #4caf50; }
+  .login-box { background: #fafafa; border: 1px solid #eee; padding: 20px; border-radius: 10px; margin-bottom: 24px; }
+  .hidden { display: none; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .logout-btn { background: #f0f0f0; color: #111; border: 1px solid #ddd; padding: 8px 16px; font-size: 0.85rem; }
+  .logout-btn:hover { background: #e5e5e5; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .stat-card { background: #fafafa; border: 1px solid #eee; border-radius: 10px; padding: 16px; }
+  .stat-card .label { color: #888; font-size: 0.8rem; margin-bottom: 6px; }
+  .stat-card .value { font-size: 1.8rem; font-weight: 700; color: #ff4757; }
+  .stat-table { width: 100%; border-collapse: collapse; background: #fafafa; border: 1px solid #eee; border-radius: 10px; overflow: hidden; }
+  .stat-table th, .stat-table td { padding: 10px 12px; text-align: left; font-size: 0.85rem; border-bottom: 1px solid #eee; color: #111; }
+  .stat-table th { background: #f0f0f0; color: #555; font-weight: 600; }
+  .stat-table tr:last-child td { border-bottom: none; }
+  .stat-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .stat-table .title-cell { max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .live-badge { display: inline-block; width: 8px; height: 8px; background: #4caf50; border-radius: 50%; margin-right: 6px; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  .single-form { background: #fafafa; border: 1px solid #eee; border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+  .single-form h3 { font-size: 1rem; margin-bottom: 16px; color: #ff4757; }
+  .preview-row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 12px; }
+  .preview-box { flex: 1; min-width: 180px; }
+  .preview-box .label { font-size: 0.75rem; color: #888; margin-bottom: 6px; }
+  .preview-box .img-wrap { aspect-ratio: 16/9; background: #fff; border: 1px solid #ddd; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #aaa; font-size: 0.8rem; overflow: hidden; position: relative; }
+  .preview-box .img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+  .preview-box .img-wrap .err { color: #ff4757; font-size: 0.75rem; padding: 10px; text-align: center; }
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .provider-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 600; margin-left: 6px; }
+  .provider-badge.dood { background: #2d7a3e; color: #b3f0c0; }
+  .provider-badge.abyss { background: #7a3e2d; color: #f0c0b3; }
+  .provider-badge.direct { background: #2d5a7a; color: #b3d9f0; }
+  .provider-badge.unknown { background: #444; color: #bbb; }
+
+  .tab-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .tab-bar button { background: #f0f0f0; color: #111; border: 1px solid #ddd; padding: 10px 18px; font-size: 0.85rem; }
+  .tab-bar button.active { background: #ff4757; color: #fff; border-color: #ff4757; }
+
+  .upload-box { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 6px; }
+  .upload-box input[type="file"] { padding: 8px; background: #fff; border: 1px dashed #bbb; border-radius: 8px; width: auto; flex: 1; min-width: 200px; cursor: pointer; }
+
+  @media (max-width: 600px) {
+    .row-2 { grid-template-columns: 1fr; }
+    .video-item { flex-direction: column; align-items: stretch; }
+    .video-item .actions { justify-content: flex-end; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <a href="index.html" class="back-link">← Kembali ke Beranda</a>
+
+  <div class="topbar">
+    <h1>Admin <span>Panel</span></h1>
+    <button class="logout-btn hidden" id="logoutBtn" onclick="doLogout()">Logout</button>
+  </div>
+
+  <div class="login-box" id="loginBox">
+    <div class="form-group">
+      <label>Email Admin</label>
+      <input type="email" id="adminEmail" placeholder="admin@contoh.com">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="adminPassword" placeholder="••••••••">
+    </div>
+    <button onclick="doLogin()">Login</button>
+    <span id="loginStatus" style="margin-left:12px;font-size:0.85rem;color:#ff4757;"></span>
+  </div>
+
+  <div id="adminPanel" class="hidden">
+    
+    <!-- SINKRONISASI DOODSTREAM -->
+    <div style="margin-bottom: 24px; padding: 16px; background: #f0f8ff; border: 1px solid #b3d9f0; border-radius: 10px;">
+      <h3 style="font-size: 1rem; margin-bottom: 10px; color: #2d5a7a;">Sinkronisasi DoodStream</h3>
+      <p class="hint" style="margin-bottom: 12px;">Tarik video terbaru dari akun DoodStream Anda langsung ke database.</p>
+      <button onclick="syncDoodstream()" id="syncDoodBtn" style="background: #229ED9; color: white; border: none; padding: 10px 16px;">🔄 Tarik Video dari DoodStream</button>
+      <span id="syncDoodStatus" style="margin-left: 10px; font-size: 0.85rem; color: #4caf50;"></span>
+    </div>
+
+    <h2 style="font-size:1.1rem; margin-bottom:12px;"><span class="live-badge"></span>Statistik Realtime</h2>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="label">Total Video</div><div class="value" id="totalVideos">0</div></div>
+      <div class="stat-card"><div class="label">Total Views</div><div class="value" id="totalViews">0</div></div>
+      <div class="stat-card"><div class="label">Total Likes</div><div class="value" id="totalLikes">0</div></div>
+      <div class="stat-card"><div class="label">Video Terpopuler</div><div class="value" id="topVideo" style="font-size:1rem;">-</div></div>
+    </div>
+
+    <h2 style="font-size:1.1rem; margin:24px 0 12px;">Statistik per Video</h2>
+    <div style="overflow-x:auto;">
+      <table class="stat-table">
+        <thead><tr><th>Judul</th><th class="num">Views</th><th class="num">Likes</th></tr></thead>
+        <tbody id="statTableBody"><tr><td colspan="3" style="color:#aaa;">Memuat...</td></tr></tbody>
+      </table>
+    </div>
+
+    <hr style="border-color:#eee; margin:30px 0;">
+
+    <div class="tab-bar">
+      <button id="tabEmbedBtn" class="active" onclick="switchTab('embed')">📺 Upload Embed (Dood/Abyss)</button>
+      <button id="tabDirectBtn" onclick="switchTab('direct')">🔗 Upload Link Langsung (MP4)</button>
+    </div>
+
+    <!-- FORM EMBED -->
+    <div class="single-form" id="formEmbed">
+      <h3>Upload Video Embed (Satu per Satu)</h3>
+
+      <div class="form-group">
+        <label>Judul Video <span class="req">*</span></label>
+        <input type="text" id="sTitle" placeholder="Contoh: Video Keren Banget">
+      </div>
+
+      <div class="form-group">
+        <label>Kode Embed / URL Video <span class="req">*</span> <span id="providerBadge"></span></label>
+        <textarea id="sEmbed" placeholder='Tempel URL atau iframe (Contoh): https://dood.li/e/93ixvwjgvil2enfc atau https://player.abyssplayer.com/8OgmaL-pR'></textarea>
+      </div>
+
+      <!-- MANUAL THUMBNAIL INPUT & UPLOAD -->
+      <div class="row-2">
+        <div class="form-group">
+          <label>URL Thumbnail (Manual/Opsional)</label>
+          <input type="text" id="sThumb" placeholder="https://i.imgur.com/contoh.jpg">
+          
+          <div class="upload-box">
+            <input type="file" id="sThumbFile" accept="image/*">
+            <button type="button" class="auto-btn" onclick="uploadThumbFile('sThumb', 'sThumbFile')">Upload</button>
+          </div>
+          <div class="hint" id="sThumbUploadStatus"></div>
+        </div>
+        <div class="form-group">
+          <label>URL Splash Image (Manual/Opsional)</label>
+          <input type="text" id="sSplash" placeholder="https://i.imgur.com/contoh.jpg">
+          
+          <div class="upload-box">
+            <input type="file" id="sSplashFile" accept="image/*">
+            <button type="button" class="auto-btn" onclick="uploadThumbFile('sSplash', 'sSplashFile')">Upload</button>
+          </div>
+          <div class="hint" id="sSplashUploadStatus"></div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; margin-top:8px;">
+        <button type="button" class="secondary" onclick="previewSingle()">Preview</button>
+        <button type="button" class="secondary" onclick="detectProvider()">Deteksi Provider</button>
+      </div>
+
+      <div class="preview-row" id="previewRow" style="display:none;">
+        <div class="preview-box">
+          <div class="label">Preview Thumbnail</div>
+          <div class="img-wrap" id="prevThumb"><span>Belum diisi</span></div>
+        </div>
+        <div class="preview-box">
+          <div class="label">Preview Splash</div>
+          <div class="img-wrap" id="prevSplash"><span>Belum diisi</span></div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+        <button onclick="addSingle()" id="singleBtn">+ Simpan Video Ini</button>
+        <button type="button" class="secondary" onclick="resetSingle()">Reset Form</button>
+        <span id="singleStatus"></span>
+      </div>
+    </div>
+
+    <!-- FORM DIRECT -->
+    <div class="single-form hidden" id="formDirect">
+      <h3>🔗 Upload Video via Link Langsung (MP4)</h3>
+      <p class="hint" style="margin-bottom:16px;">
+        Tempel link file video langsung (biasanya berakhiran <code>.mp4</code>, <code>.webm</code>, atau <code>.mov</code>).
+      </p>
+
+      <div class="form-group">
+        <label>Judul Video <span class="req">*</span></label>
+        <input type="text" id="dTitle" placeholder="Contoh: Video Dari Link Langsung">
+      </div>
+
+      <div class="form-group">
+        <label>Link Video Langsung <span class="req">*</span> <span id="directBadge"></span></label>
+        <input type="text" id="dUrl" placeholder="https://cdn2.aceimp.com/upload/?f=2ab0d516.mp4">
+      </div>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px;">
+        <button type="button" class="auto-btn" onclick="previewDirect()">Preview Video</button>
+      </div>
+
+      <div class="row-2">
+        <div class="form-group">
+          <label>URL Thumbnail (opsional)</label>
+          <input type="text" id="dThumb" placeholder="https://contoh.com/thumb.jpg">
+          <div class="upload-box">
+            <input type="file" id="dThumbFile" accept="image/*">
+            <button type="button" class="auto-btn" onclick="uploadThumbFile('dThumb', 'dThumbFile')">Upload</button>
+          </div>
+          <div class="hint" id="dThumbUploadStatus"></div>
+        </div>
+        <div class="form-group">
+          <label>URL Splash (opsional)</label>
+          <input type="text" id="dSplash" placeholder="https://contoh.com/splash.jpg">
+          <div class="upload-box">
+            <input type="file" id="dSplashFile" accept="image/*">
+            <button type="button" class="auto-btn" onclick="uploadThumbFile('dSplash', 'dSplashFile')">Upload</button>
+          </div>
+          <div class="hint" id="dSplashUploadStatus"></div>
+        </div>
+      </div>
+
+      <div class="preview-row" id="directPreviewRow" style="display:none;">
+        <div class="preview-box" style="flex:1 1 100%;">
+          <div class="label">Preview Video</div>
+          <div class="img-wrap" id="directVideoPreview" style="aspect-ratio:16/9;">
+            <span>Belum ada video</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+        <button onclick="addDirect()" id="directBtn">+ Simpan Video Link Langsung</button>
+        <button type="button" class="secondary" onclick="resetDirect()">Reset Form</button>
+        <span id="directStatus"></span>
+      </div>
+    </div>
+
+    <hr style="border-color:#eee; margin:30px 0;">
+
+    <!-- TAMBAH MASSAL -->
+    <h2 style="font-size:1.1rem; margin-bottom:12px;">Tambah Massal (Opsional)</h2>
+    <div class="form-group">
+      <label>Format: Judul | embed_atau_link | thumbnail_opsional | splash_opsional</label>
+      <textarea id="bulkInput" placeholder='Video Keren 1 | https://dood.li/e/93ixvwjgvil2enfc
+Video Abyss | https://player.abyssplayer.com/8OgmaL-pR | https://i.imgur.com/contoh.jpg'></textarea>
+    </div>
+    <button onclick="addBulk()" id="bulkBtn">+ Tambah Semua Sekaligus</button>
+    <span id="status"></span>
+
+    <hr style="border-color:#eee; margin:30px 0;">
+
+    <!-- LIST VIDEO TERPISAH -->
+    <h2 style="font-size:1.1rem; margin-bottom:12px; color: #2d7a3e;">📺 Daftar Video DoodStream / Abyss</h2>
+    <div id="adminListEmbed" style="margin-bottom: 30px;"><p style="color:#aaa;">Memuat...</p></div>
+
+    <h2 style="font-size:1.1rem; margin-bottom:12px; color: #2d5a7a;">🔗 Daftar Video Link Langsung (MP4)</h2>
+    <div id="adminListDirect"><p style="color:#aaa;">Memuat...</p></div>
+
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, deleteDoc, doc, query, orderBy, onSnapshot, getDocs, where }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  // Import Firebase Storage
+  import { getStorage, ref, uploadBytes, getDownloadURL }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyATGNzE8e6McTLl9OnDV70aKfyXhDR_Jgo",
+    authDomain: "videy-clone-50c2b.firebaseapp.com",
+    projectId: "videy-clone-50c2b",
+    storageBucket: "videy-clone-50c2b.firebasestorage.app",
+    messagingSenderId: "663076090581",
+    appId: "1:663076090581:web:7c977193104a43b18ba85c"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+  const storage = getStorage(app); // Inisialisasi Storage
+  const videosRef = collection(db, "videos");
+
+  let unsubList = null;
+
+  const DOOD_THUMB_DOMAINS = [
+    'https://img.doodcdn.co/snaps/',
+    'https://img.doodcdn.com/snaps/',
+    'https://imgds.net/snaps/'
+  ];
+  const DOOD_SPLASH_DOMAINS = [
+    'https://img.doodcdn.co/splash/',
+    'https://img.doodcdn.com/splash/',
+    'https://imgds.net/splash/'
+  ];
+
+  // ==========================================
+  // FUNGSI UPLOAD FILE GAMBAR KE FIREBASE
+  // ==========================================
+  window.uploadThumbFile = async function(inputUrlId, inputFileId) {
+    const fileInput = document.getElementById(inputFileId);
+    const urlInput = document.getElementById(inputUrlId);
+    const statusEl = document.getElementById(inputUrlId + 'UploadStatus');
+
+    if (!fileInput.files || fileInput.files.length === 0) {
+      alert('Pilih file gambar terlebih dahulu.');
+      return;
+    }
+
+    const file = fileInput.files[0];
+    statusEl.textContent = 'Mengunggah...';
+    statusEl.style.color = '#ffb347';
+
+    try {
+      // Buat nama unik untuk file
+      const fileName = `thumbnails/${Date.now()}_${file.name}`;
+      const storageRef = ref(storage, fileName);
+      
+      // Upload file
+      await uploadBytes(storageRef, file);
+      
+      // Ambil URL download
+      const downloadUrl = await getDownloadURL(storageRef);
+      
+      // Masukkan URL ke input text
+      urlInput.value = downloadUrl;
+      statusEl.textContent = '✅ Upload berhasil!';
+      statusEl.style.color = '#4caf50';
+      
+      // Otomatis preview jika di form embed
+      if (inputUrlId === 'sThumb' || inputUrlId === 'sSplash') {
+        previewSingle();
+      }
+
+    } catch (e) {
+      console.error(e);
+      statusEl.textContent = '❌ Gagal: ' + e.message;
+      statusEl.style.color = '#ff4757';
+    }
+  };
+
+  // ==========================================
+  // FUNGSI SINKRONISASI DOODSTREAM
+  // ==========================================
+  window.syncDoodstream = async function() {
+    const DOOD_API_KEY = '581143tis98x6zgg5cfqo1'; 
+    const DOOD_API_URL = `https://doodapi.com/api/file/list?key=${DOOD_API_KEY}`;
+    
+    const btn = document.getElementById('syncDoodBtn');
+    const status = document.getElementById('syncDoodStatus');
+    
+    btn.disabled = true;
+    status.style.color = '#ffb347';
+    status.textContent = 'Menghubungi DoodStream...';
+
+    try {
+      const response = await fetch(DOOD_API_URL);
+      const data = await response.json();
+
+      if (data.msg !== 'OK') {
+        throw new Error('API Error: ' + data.msg);
+      }
+
+      const files = data.result.files;
+      status.textContent = `Ditemukan ${files.length} video. Mengecek database...`;
+
+      let addedCount = 0;
+
+      for (const file of files) {
+        const fileCode = file.file_code;
+        const title = file.title || `Video ${fileCode}`;
+
+        const q = query(videosRef, where('doodId', '==', fileCode));
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+          await addDoc(videosRef, {
+            title: title,
+            embed: `https://dood.li/e/${fileCode}`,
+            src: `https://dood.li/e/${fileCode}`,
+            thumb: `https://img.doodcdn.co/snaps/${fileCode}.jpg`,
+            splash: `https://img.doodcdn.co/splash/${fileCode}.jpg`,
+            doodId: fileCode,
+            provider: 'doodstream',
+            createdAt: Date.now(),
+            views: 0,
+            likes: 0
+          });
+          addedCount++;
+          status.textContent = `Menyimpan... (${addedCount} baru)`;
+        }
+      }
+
+      status.style.color = '#4caf50';
+      status.textContent = `✅ Selesai! ${addedCount} video baru berhasil ditambahkan.`;
+      
+    } catch (error) {
+      console.error(error);
+      status.style.color = '#ff4757';
+      status.textContent = '❌ Gagal: ' + error.message;
+    } finally {
+      btn.disabled = false;
+      setTimeout(() => { status.textContent = ''; }, 5000);
+    }
+  };
+
+  window.doLogin = async function () {
+    const email = document.getElementById('adminEmail').value.trim();
+    const pass = document.getElementById('adminPassword').value;
+    const st = document.getElementById('loginStatus');
+    if (!email || !pass) { st.textContent = 'Email dan password wajib diisi.'; return; }
+    st.textContent = 'Memproses...';
+    try {
+      await signInWithEmailAndPassword(auth, email, pass);
+      st.textContent = '';
+    } catch (e) {
+      st.textContent = 'Login gagal: ' + e.message;
+    }
+  };
+
+  window.doLogout = async function () {
+    if (unsubList) { unsubList(); unsubList = null; }
+    await signOut(auth);
+  };
+
+  onAuthStateChanged(auth, (user) => {
+    document.getElementById('loginBox').classList.toggle('hidden', !!user);
+    document.getElementById('adminPanel').classList.toggle('hidden', !user);
+    document.getElementById('logoutBtn').classList.toggle('hidden', !user);
+    if (user) startRealtime();
+    else if (unsubList) { unsubList(); unsubList = null; }
+  });
+
+  function startRealtime() {
+    if (unsubList) unsubList();
+    const q = query(videosRef, orderBy('createdAt', 'desc'));
+    unsubList = onSnapshot(q, (snap) => {
+      const videos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderAdminLists(videos);
+      renderStats(videos);
+    }, (err) => {
+      document.getElementById('adminListEmbed').innerHTML =
+        '<p style="color:#ff4757;">Gagal memuat: ' + err.message + '</p>';
+    });
+  }
+
+  window.switchTab = function (tab) {
+    const isEmbed = tab === 'embed';
+    document.getElementById('formEmbed').classList.toggle('hidden', !isEmbed);
+    document.getElementById('formDirect').classList.toggle('hidden', isEmbed);
+    document.getElementById('tabEmbedBtn').classList.toggle('active', isEmbed);
+    document.getElementById('tabDirectBtn').classList.toggle('active', !isEmbed);
+  };
+
+  function extractSrc(embed) {
+    embed = (embed || '').trim();
+    if (embed.includes('<iframe')) {
+      const m = embed.match(/src=["']([^"']+)["']/);
+      if (m) return m[1];
+    }
+    return embed;
+  }
+
+  function isDirectVideoUrl(url) {
+    if (!url) return false;
+    if (/\.(mp4|webm|mov|m4v|ogv)(\?|#|$)/i.test(url)) return true;
+    if (/[?&]f=[^&]+\.(mp4|webm|mov)/i.test(url)) return true;
+    return false;
+  }
+
+  function detectProviderFromUrl(url) {
+    if (!url) return 'unknown';
+    if (isDirectVideoUrl(url)) return 'direct';
+    if (/abyssplayer\.com/i.test(url)) return 'abyss';
+    if (/(dood\.|doodstream|doodapi)/i.test(url) || /\/[ed]\/[a-z0-9]{6,}/i.test(url)) return 'doodstream';
+    return 'unknown';
+  }
+
+  function extractVideoInfo(url) {
+    if (!url) return null;
+    if (isDirectVideoUrl(url)) return { id: '', provider: 'direct' };
+
+    if (/abyssplayer\.com/i.test(url)) {
+      const parts = url.split('/');
+      const id = parts[parts.length - 1].split('?')[0]; 
+      return { id: id, provider: 'abyss' };
+    }
+
+    const dood = url.match(/\/(?:e|d)\/([a-z0-9]+)/i);
+    if (dood) return { id: dood[1], provider: 'doodstream' };
+
+    return null;
+  }
+
+  function autoThumb(id, provider) {
+    if (provider === 'doodstream' && id) return DOOD_THUMB_DOMAINS[0] + id + '.jpg';
+    return '';
+  }
+  function autoSplash(id, provider) {
+    if (provider === 'doodstream' && id) return DOOD_SPLASH_DOMAINS[0] + id + '.jpg';
+    return '';
+  }
+
+  function updateProviderBadge(url) {
+    const badge = document.getElementById('providerBadge');
+    const p = detectProviderFromUrl(url);
+    if (p === 'doodstream') badge.innerHTML = '<span class="provider-badge dood">DoodStream</span>';
+    else if (p === 'abyss') badge.innerHTML = '<span class="provider-badge abyss">Abyss</span>';
+    else if (p === 'direct') badge.innerHTML = '<span class="provider-badge direct">Link Langsung</span>';
+    else badge.innerHTML = '<span class="provider-badge unknown">?</span>';
+  }
+
+  function updateDirectBadge(url) {
+    const badge = document.getElementById('directBadge');
+    if (!url) { badge.innerHTML = ''; return; }
+    if (isDirectVideoUrl(url)) badge.innerHTML = '<span class="provider-badge direct">Terdeteksi Video</span>';
+    else badge.innerHTML = '<span class="provider-badge unknown">Bukan Link Video</span>';
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const ta = document.getElementById('sEmbed');
+    if (ta) ta.addEventListener('input', () => updateProviderBadge(extractSrc(ta.value)));
+    const du = document.getElementById('dUrl');
+    if (du) du.addEventListener('input', () => {
+      updateDirectBadge(du.value.trim());
+      const row = document.getElementById('directPreviewRow');
+      if (row) row.style.display = 'none';
+    });
+  });
+
+  window.detectProvider = function () {
+    const embed = document.getElementById('sEmbed').value.trim();
+    if (!embed) { alert('Tempel dulu URL / iframe.'); return; }
+    const src = extractSrc(embed);
+    const info = extractVideoInfo(src);
+    if (!info) {
+      alert('Provider tidak terdeteksi.\n\nURL:\n' + src);
+      return;
+    }
+    alert('Provider: ' + info.provider + '\nID: ' + (info.id || '-'));
+  };
+
+  window.previewSingle = function () {
+    const thumb = document.getElementById('sThumb').value.trim();
+    const splash = document.getElementById('sSplash').value.trim();
+    
+    const embed = document.getElementById('sEmbed').value.trim();
+    if(embed) updateProviderBadge(extractSrc(embed));
+
+    document.getElementById('previewRow').style.display = 'flex';
+    renderPreview('prevThumb', thumb, 0);
+    renderPreview('prevSplash', splash, 0);
+  };
+
+  function renderPreview(boxId, url, attempt) {
+    const box = document.getElementById(boxId);
+    if (!url) { box.innerHTML = '<span>Belum diisi</span>'; return; }
+    if (!/^https?:\/\//.test(url)) { box.innerHTML = '<span class="err">URL tidak valid</span>'; return; }
+
+    box.innerHTML = `<img src="${escapeHtml(url)}" alt="">`;
+    const img = box.querySelector('img');
+
+    img.onerror = () => {
+      const match = url.match(/\/(snaps|splash)\/([a-z0-9]+)\.(jpg|jpeg|png)/i);
+      if (match && attempt < 2) {
+        const kind = match[1];
+        const id = match[2];
+        const domains = kind === 'snaps' ? DOOD_THUMB_DOMAINS : DOOD_SPLASH_DOMAINS;
+        const nextUrl = domains[attempt + 1] + id + '.jpg';
+        renderPreview(boxId, nextUrl, attempt + 1);
+      } else {
+        box.innerHTML = '<span class="err">Gagal dimuat</span>';
+      }
+    };
+  }
+
+  window.resetSingle = function () {
+    ['sTitle', 'sEmbed', 'sThumb', 'sSplash'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('sThumbFile').value = '';
+    document.getElementById('sSplashFile').value = '';
+    document.getElementById('sThumbUploadStatus').textContent = '';
+    document.getElementById('sSplashUploadStatus').textContent = '';
+    document.getElementById('previewRow').style.display = 'none';
+    document.getElementById('singleStatus').textContent = '';
+    updateProviderBadge('');
+  };
+
+  window.addSingle = async function () {
+    const title = document.getElementById('sTitle').value.trim();
+    const embed = document.getElementById('sEmbed').value.trim();
+    let thumb = document.getElementById('sThumb').value.trim();
+    let splash = document.getElementById('sSplash').value.trim();
+    const btn = document.getElementById('singleBtn');
+    const status = document.getElementById('singleStatus');
+
+    if (!title) { alert('Judul wajib diisi.'); return; }
+    if (!embed) { alert('Kode embed / URL video wajib diisi.'); return; }
+
+    const src = extractSrc(embed);
+    if (!/^https?:\/\//.test(src)) { alert('Embed tidak valid.'); return; }
+
+    const info = extractVideoInfo(src);
+    const provider = info ? info.provider : 'unknown';
+    const videoId = info ? info.id : '';
+
+    if (!thumb && provider === 'doodstream') thumb = autoThumb(videoId, 'doodstream');
+    if (!splash && provider === 'doodstream') splash = autoSplash(videoId, 'doodstream');
+
+    btn.disabled = true;
+    status.textContent = 'Menyimpan...';
+    try {
+      await addDoc(videosRef, {
+        title, embed, src,
+        thumb: thumb || '',
+        splash: splash || '',
+        doodId: provider === 'doodstream' ? videoId : '',
+        abyssId: provider === 'abyss' ? videoId : '',
+        provider: provider,
+        createdAt: Date.now(),
+        views: 0, likes: 0
+      });
+      status.textContent = 'Video (' + provider + ') berhasil disimpan.';
+      resetSingle();
+      setTimeout(() => { status.textContent = ''; }, 4000);
+    } catch (e) {
+      status.textContent = 'Gagal: ' + e.message;
+    } finally {
+      btn.disabled = false;
+    }
+  };
+
+  window.previewDirect = function () {
+    const url = document.getElementById('dUrl').value.trim();
+    if (!url) { alert('Tempel dulu link video langsung.'); return; }
+    if (!/^https?:\/\//.test(url)) { alert('URL tidak valid.'); return; }
+
+    const row = document.getElementById('directPreviewRow');
+    const box = document.getElementById('directVideoPreview');
+    row.style.display = 'flex';
+    box.innerHTML = `<video src="${escapeHtml(url)}" controls playsinline style="width:100%;height:100%;object-fit:contain;background:#000;"></video>`;
+  };
+
+  window.resetDirect = function () {
+    ['dTitle', 'dUrl', 'dThumb', 'dSplash'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('dThumbFile').value = '';
+    document.getElementById('dSplashFile').value = '';
+    document.getElementById('dThumbUploadStatus').textContent = '';
+    document.getElementById('dSplashUploadStatus').textContent = '';
+    document.getElementById('directPreviewRow').style.display = 'none';
+    document.getElementById('directStatus').textContent = '';
+    updateDirectBadge('');
+  };
+
+  window.addDirect = async function () {
+    const title = document.getElementById('dTitle').value.trim();
+    const url = document.getElementById('dUrl').value.trim();
+    const thumb = document.getElementById('dThumb').value.trim();
+    const splash = document.getElementById('dSplash').value.trim();
+    const btn = document.getElementById('directBtn');
+    const status = document.getElementById('directStatus');
+
+    if (!title) { alert('Judul wajib diisi.'); return; }
+    if (!url) { alert('Link video langsung wajib diisi.'); return; }
+    if (!/^https?:\/\//.test(url)) { alert('URL tidak valid.'); return; }
+
+    btn.disabled = true;
+    status.textContent = 'Menyimpan...';
+    try {
+      await addDoc(videosRef, {
+        title, embed: url, src: url,
+        thumb: thumb || '', splash: splash || '',
+        doodId: '', abyssId: '',
+        provider: 'direct',
+        createdAt: Date.now(),
+        views: 0, likes: 0
+      });
+      status.textContent = '✅ Video link langsung berhasil disimpan.';
+      status.style.color = '#4caf50';
+      resetDirect();
+      setTimeout(() => { status.textContent = ''; }, 4000);
+    } catch (e) {
+      status.textContent = 'Gagal: ' + e.message;
+      status.style.color = '#ff4757';
+    } finally {
+      btn.disabled = false;
+    }
+  };
+
+  function parseLine(line, index) {
+    const parts = line.split('|').map(s => s.trim());
+    let title, embed, thumb, splash;
+    if (parts.length === 1) { title = 'Video ' + (index + 1); embed = parts[0]; }
+    else {
+      title = parts[0] || 'Video ' + (index + 1);
+      embed = parts[1] || '';
+      thumb = parts[2] || '';
+      splash = parts[3] || '';
+    }
+    const src = extractSrc(embed);
+    const info = extractVideoInfo(src);
+    const provider = info ? info.provider : 'unknown';
+    const videoId = info ? info.id : '';
+    if (!thumb && provider === 'doodstream') thumb = autoThumb(videoId, 'doodstream');
+    if (!splash && provider === 'doodstream') splash = autoSplash(videoId, 'doodstream');
+    return { title, embed, src, thumb, splash, provider, videoId };
+  }
+
+  window.addBulk = async function () {
+    const raw = document.getElementById('bulkInput').value;
+    const btn = document.getElementById('bulkBtn');
+    const status = document.getElementById('status');
+    if (!raw.trim()) { alert('Kolom input masih kosong.'); return; }
+    const lines = raw.split('\n').map(l => l.trim()).filter(l => l !== '');
+    if (lines.length === 0) { alert('Tidak ada baris yang valid.'); return; }
+
+    const items = [], invalid = [];
+    lines.forEach((line, i) => {
+      const p = parseLine(line, i);
+      if (!p.src || !/^https?:\/\//.test(p.src)) {
+        invalid.push('Baris ' + (i + 1) + ': embed/link tidak valid');
+      } else {
+        items.push({
+          title: p.title, embed: p.embed, src: p.src,
+          thumb: p.thumb || '', splash: p.splash || '',
+          doodId: p.provider === 'doodstream' ? p.videoId : '',
+          abyssId: p.provider === 'abyss' ? p.videoId : '',
+          provider: p.provider,
+          createdAt: Date.now() + i, views: 0, likes: 0
+        });
+      }
+    });
+
+    if (items.length === 0) { alert('Semua baris tidak valid:\n' + invalid.join('\n')); return; }
+
+    btn.disabled = true;
+    status.textContent = 'Menyimpan ' + items.length + ' video...';
+    try {
+      for (const item of items) await addDoc(videosRef, item);
+      status.textContent = items.length + ' video berhasil disimpan.';
+      document.getElementById('bulkInput').value = '';
+      if (invalid.length) status.textContent += ' (' + invalid.length + ' baris dilewati)';
+    } catch (e) {
+      status.textContent = 'Gagal: ' + e.message;
+    } finally {
+      btn.disabled = false;
+      setTimeout(() => { status.textContent = ''; }, 6000);
+    }
+  };
+
+  function renderStats(videos) {
+    const totalVideos = videos.length;
+    const totalViews = videos.reduce((s, v) => s + (v.views || 0), 0);
+    const totalLikes = videos.reduce((s, v) => s + (v.likes || 0), 0);
+    const top = [...videos].sort((a, b) => (b.views || 0) - (a.views || 0))[0];
+    document.getElementById('totalVideos').textContent = totalVideos;
+    document.getElementById('totalViews').textContent = totalViews;
+    document.getElementById('totalLikes').textContent = totalLikes;
+    document.getElementById('topVideo').textContent = top ? (top.title || 'Tanpa Judul') : '-';
+
+    const body = document.getElementById('statTableBody');
+    if (videos.length === 0) {
+      body.innerHTML = '<tr><td colspan="3" style="color:#aaa;">Belum ada video.</td></tr>';
+      return;
+    }
+    body.innerHTML = videos.map(v => `
+      <tr>
+        <td class="title-cell">${escapeHtml(v.title || 'Tanpa Judul')}</td>
+        <td class="num">${v.views || 0}</td>
+        <td class="num">${v.likes || 0}</td>
+      </tr>
+    `).join('');
+  }
+
+  function renderAdminLists(videos) {
+    const listEmbed = document.getElementById('adminListEmbed');
+    const listDirect = document.getElementById('adminListDirect');
+
+    const embedVideos = videos.filter(v => v.provider !== 'direct' && !isDirectVideoUrl(v.src));
+    const directVideos = videos.filter(v => v.provider === 'direct' || isDirectVideoUrl(v.src));
+
+    if (embedVideos.length === 0) {
+      listEmbed.innerHTML = '<p style="color:#aaa;">Belum ada video DoodStream / Abyss.</p>';
+    } else {
+      listEmbed.innerHTML = embedVideos.map(v => generateVideoHTML(v)).join('');
+    }
+
+    if (directVideos.length === 0) {
+      listDirect.innerHTML = '<p style="color:#aaa;">Belum ada video Link Langsung.</p>';
+    } else {
+      listDirect.innerHTML = directVideos.map(v => generateVideoHTML(v)).join('');
+    }
+  }
+
+  function generateVideoHTML(v) {
+    const thumb = v.thumb || v.splash || '';
+    let badge = '';
+    if (v.provider === 'doodstream') badge = '<span class="provider-badge dood">Dood</span>';
+    else if (v.provider === 'abyss') badge = '<span class="provider-badge abyss">Abyss</span>';
+    else if (v.provider === 'direct') badge = '<span class="provider-badge direct">Link</span>';
+
+    const fallbackAttr = v.doodId
+      ? `onerror="tryThumbMini(this, '${v.doodId}', 1)"`
+      : `onerror="this.style.visibility='hidden'"`;
+      
+    return `
+    <div class="video-item">
+      <div class="info">
+        ${thumb
+          ? `<img class="thumb-mini" src="${escapeHtml(thumb)}" alt="" ${fallbackAttr}>`
+          : '<div class="thumb-mini"></div>'}
+        <div class="txt">
+          <strong>${escapeHtml(v.title)} ${badge}</strong>
+          <small>👁 ${v.views || 0} · 👍 ${v.likes || 0} · ${escapeHtml(v.src || '')}</small>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="copy-btn" onclick="copyVideoLink('${v.id}', this)">Salin Link</button>
+        <button onclick="removeVideo('${v.id}')">Hapus</button>
+      </div>
+    </div>`;
+  }
+
+  window.tryThumbMini = function (img, id, attempt) {
+    if (attempt < DOOD_THUMB_DOMAINS.length) {
+      img.src = DOOD_THUMB_DOMAINS[attempt] + id + '.jpg';
+      img.onerror = () => window.tryThumbMini(img, id, attempt + 1);
+    } else {
+      img.style.visibility = 'hidden';
+    }
+  };
+
+  window.copyVideoLink = async function (id, btn) {
+    const base = location.origin + location.pathname.replace(/admin\.html?$/i, '');
+    const url = base + '?id=' + id;
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      const old = btn.textContent;
+      btn.textContent = 'Tersalin';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = old;
+        btn.classList.remove('copied');
+      }, 1500);
+    } catch (e) {
+      prompt('Salin manual link berikut:', url);
+    }
+  };
+
+  window.removeVideo = async function (id) {
+    if (!confirm('Hapus video ini?')) return;
+    try { await deleteDoc(doc(db, 'videos', id)); }
+    catch (e) { alert('Gagal menghapus: ' + e.message); }
+  };
+
+  function escapeHtml(str) {
+    return String(str || '').replace(/[&<>"]/g, m => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'
+    }[m]));
+  }
+</script>
+</body>
+</html>
