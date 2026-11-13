@@ -100,7 +100,7 @@
 </head>
 <body>
 <div class="container">
-  <a href="index.html" class="back-link"> Kembali ke Beranda</a>
+  <a href="index.html" class="back-link">← Kembali ke Beranda</a>
 
   <div class="topbar">
     <h1>Admin <span>Panel</span></h1>
@@ -114,7 +114,7 @@
     </div>
     <div class="form-group">
       <label>Password</label>
-      <input type="password" id="adminPassword" placeholder="">
+      <input type="password" id="adminPassword" placeholder="••••••••">
     </div>
     <button onclick="doLogin()">Login</button>
     <span id="loginStatus" style="margin-left:12px;font-size:0.85rem;color:#ff4757;"></span>
@@ -126,7 +126,7 @@
     <div style="margin-bottom: 24px; padding: 16px; background: #f0f8ff; border: 1px solid #b3d9f0; border-radius: 10px;">
       <h3 style="font-size: 1rem; margin-bottom: 10px; color: #2d5a7a;">Sinkronisasi DoodStream</h3>
       <p class="hint" style="margin-bottom: 12px;">Tarik video terbaru dari akun DoodStream Anda langsung ke database.</p>
-      <button onclick="syncDoodstream()" id="syncDoodBtn" style="background: #229ED9; color: white; border: none; padding: 10px 16px;"> Tarik Video dari DoodStream</button>
+      <button onclick="syncDoodstream()" id="syncDoodBtn" style="background: #229ED9; color: white; border: none; padding: 10px 16px;">🔄 Tarik Video dari DoodStream</button>
       <span id="syncDoodStatus" style="margin-left: 10px; font-size: 0.85rem; color: #4caf50;"></span>
     </div>
 
@@ -149,9 +149,9 @@
     <hr style="border-color:#eee; margin:30px 0;">
 
     <div class="tab-bar">
-      <button id="tabEmbedBtn" class="active" onclick="switchTab('embed')"> Upload Embed (Dood/Abyss)</button>
-      <button id="tabDirectBtn" onclick="switchTab('direct')"> Upload Link Langsung (MP4)</button>
-      <button id="tabBulkEmbedBtn" onclick="switchTab('bulk-embed')"> Upload Massal (Embed)</button>
+      <button id="tabEmbedBtn" class="active" onclick="switchTab('embed')">📺 Upload Embed (Dood/Abyss)</button>
+      <button id="tabDirectBtn" onclick="switchTab('direct')">🔗 Upload Link Langsung (MP4)</button>
+      <button id="tabBulkEmbedBtn" onclick="switchTab('bulk-embed')">📦 Upload Massal (Embed)</button>
     </div>
 
     <!-- FORM EMBED -->
@@ -217,7 +217,7 @@
 
     <!-- FORM DIRECT -->
     <div class="single-form hidden" id="formDirect">
-      <h3> Upload Video via Link Langsung (MP4)</h3>
+      <h3>🔗 Upload Video via Link Langsung (MP4)</h3>
       <p class="hint" style="margin-bottom:16px;">
         Tempel link file video langsung (biasanya berakhiran <code>.mp4</code>, <code>.webm</code>, atau <code>.mov</code>).
       </p>
@@ -275,7 +275,7 @@
 
     <!-- FORM BULK EMBED (BARU: 10 LINK SEKALIGUS) -->
     <div class="single-form hidden" id="formBulkEmbed">
-      <h3> Upload Massal (Embed) - Hingga 10 Link</h3>
+      <h3>📦 Upload Massal (Embed) - Hingga 10 Link</h3>
       <p class="hint" style="margin-bottom: 16px;">
         Masukkan judul, link embed, link thumbnail (opsional), dan link splash (opsional) untuk setiap baris.
       </p>
@@ -288,7 +288,7 @@
           <input type="text" class="b-embed" placeholder="Link Embed / URL">
           <input type="text" class="b-thumb" placeholder="Link Thumbnail (Opsional)">
           <input type="text" class="b-splash" placeholder="Link Splash (Opsional)">
-          <button type="button" class="del-btn" onclick="removeBulkRow(this)"></button>
+          <button type="button" class="del-btn" onclick="removeBulkRow(this)">✕</button>
         </div>
       </div>
 
@@ -315,10 +315,10 @@ Video Abyss | https://player.abyssplayer.com/8OgmaL-pR | https://i.imgur.com/con
     <hr style="border-color:#eee; margin:30px 0;">
 
     <!-- LIST VIDEO TERPISAH -->
-    <h2 style="font-size:1.1rem; margin-bottom:12px; color: #2d7a3e;"> Daftar Video DoodStream / Abyss</h2>
+    <h2 style="font-size:1.1rem; margin-bottom:12px; color: #2d7a3e;">📺 Daftar Video DoodStream / Abyss</h2>
     <div id="adminListEmbed" style="margin-bottom: 30px;"><p style="color:#aaa;">Memuat...</p></div>
 
-    <h2 style="font-size:1.1rem; margin-bottom:12px; color: #2d5a7a;"> Daftar Video Link Langsung (MP4)</h2>
+    <h2 style="font-size:1.1rem; margin-bottom:12px; color: #2d5a7a;">🔗 Daftar Video Link Langsung (MP4)</h2>
     <div id="adminListDirect"><p style="color:#aaa;">Memuat...</p></div>
 
   </div>
@@ -386,7 +386,7 @@ Video Abyss | https://player.abyssplayer.com/8OgmaL-pR | https://i.imgur.com/con
       const downloadUrl = await getDownloadURL(storageRef);
       
       urlInput.value = downloadUrl;
-      statusEl.textContent = ' Upload berhasil!';
+      statusEl.textContent = '✅ Upload berhasil!';
       statusEl.style.color = '#4caf50';
       
       if (inputUrlId === 'sThumb' || inputUrlId === 'sSplash') {
@@ -395,7 +395,7 @@ Video Abyss | https://player.abyssplayer.com/8OgmaL-pR | https://i.imgur.com/con
 
     } catch (e) {
       console.error(e);
-      statusEl.textContent = ' Gagal: ' + e.message;
+      statusEl.textContent = '❌ Gagal: ' + e.message;
       statusEl.style.color = '#ff4757';
     }
   };
@@ -453,12 +453,12 @@ Video Abyss | https://player.abyssplayer.com/8OgmaL-pR | https://i.imgur.com/con
       }
 
       status.style.color = '#4caf50';
-      status.textContent = ` Selesai! ${addedCount} video baru berhasil ditambahkan.`;
+      status.textContent = `✅ Selesai! ${addedCount} video baru berhasil ditambahkan.`;
       
     } catch (error) {
       console.error(error);
       status.style.color = '#ff4757';
-      status.textContent = ' Gagal: ' + error.message;
+      status.textContent = '❌ Gagal: ' + error.message;
     } finally {
       btn.disabled = false;
       setTimeout(() => { status.textContent = ''; }, 5000);
@@ -737,7 +737,7 @@ Video Abyss | https://player.abyssplayer.com/8OgmaL-pR | https://i.imgur.com/con
         createdAt: Date.now(),
         views: 0, likes: 0
       });
-      status.textContent = ' Video link langsung berhasil disimpan.';
+      status.textContent = '✅ Video link langsung berhasil disimpan.';
       status.style.color = '#4caf50';
       resetDirect();
       setTimeout(() => { status.textContent = ''; }, 4000);
@@ -767,7 +767,7 @@ Video Abyss | https://player.abyssplayer.com/8OgmaL-pR | https://i.imgur.com/con
       <input type="text" class="b-embed" placeholder="Link Embed / URL">
       <input type="text" class="b-thumb" placeholder="Link Thumbnail (Opsional)">
       <input type="text" class="b-splash" placeholder="Link Splash (Opsional)">
-      <button type="button" class="del-btn" onclick="removeBulkRow(this)"></button>
+      <button type="button" class="del-btn" onclick="removeBulkRow(this)">✕</button>
     `;
     container.appendChild(newRow);
   };
@@ -845,7 +845,7 @@ Video Abyss | https://player.abyssplayer.com/8OgmaL-pR | https://i.imgur.com/con
       for (const item of items) {
         await addDoc(videosRef, item);
       }
-      status.textContent = ` Berhasil menyimpan ${items.length} video!`;
+      status.textContent = `✅ Berhasil menyimpan ${items.length} video!`;
       status.style.color = '#4caf50';
       
       // Kosongkan form setelah berhasil
@@ -856,7 +856,7 @@ Video Abyss | https://player.abyssplayer.com/8OgmaL-pR | https://i.imgur.com/con
           <input type="text" class="b-embed" placeholder="Link Embed / URL">
           <input type="text" class="b-thumb" placeholder="Link Thumbnail (Opsional)">
           <input type="text" class="b-splash" placeholder="Link Splash (Opsional)">
-          <button type="button" class="del-btn" onclick="removeBulkRow(this)"></button>
+          <button type="button" class="del-btn" onclick="removeBulkRow(this)">✕</button>
         </div>
       `;
 
@@ -865,7 +865,7 @@ Video Abyss | https://player.abyssplayer.com/8OgmaL-pR | https://i.imgur.com/con
       }
       setTimeout(() => { status.textContent = ''; }, 6000);
     } catch (e) {
-      status.textContent = ' Gagal: ' + e.message;
+      status.textContent = '❌ Gagal: ' + e.message;
       status.style.color = '#ff4757';
     } finally {
       btn.disabled = false;
@@ -999,7 +999,7 @@ Video Abyss | https://player.abyssplayer.com/8OgmaL-pR | https://i.imgur.com/con
           : '<div class="thumb-mini"></div>'}
         <div class="txt">
           <strong>${escapeHtml(v.title)} ${badge}</strong>
-          <small> ${v.views || 0} �  ${v.likes || 0} � ${escapeHtml(v.src || '')}</small>
+          <small>👁 ${v.views || 0} · 👍 ${v.likes || 0} · ${escapeHtml(v.src || '')}</small>
         </div>
       </div>
       <div class="actions">
