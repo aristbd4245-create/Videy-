@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VideoStream</title>
-<script data-cfasync="false" src="https://benchform.org/1/9e72240f75b407d58c240d814380fcc7"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: system-ui, -apple-system, sans-serif; background: #ffffff; color: #111; }
@@ -14,9 +13,10 @@
   .header h1 span { color: #ff4757; }
   .tg-btn { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: #229ED9; padding: 8px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; color: #fff; }
   .tg-btn:hover { background: #1b8ec4; }
-  .main-container { max-width: 1100px; margin: 20px auto; padding: 0 12px; }
+  /* LIST & PLAYER LEBAR */
+  .main-container { max-width: 1800px; margin: 20px auto; padding: 0 16px; }
   .hidden { display: none !important; }
-  .video-grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .video-grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
   .video-box { background: #000; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden; position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; border: 1px solid #333; transition: transform 0.2s, opacity 0.2s; }
   .video-box:hover { transform: scale(1.03); opacity: 0.9; }
   .video-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -29,18 +29,21 @@
   .video-box:hover .title-overlay { opacity: 1; }
   .btn-back { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #f0f0f0; color: #111; border: 1px solid #ddd; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-bottom: 16px; }
   .btn-back:hover { background: #e5e5e5; }
-  .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; background: #000; border-radius: 12px; overflow: hidden; }
+  /* === PLAYER LEBAR & PANJANG === */
+  .video-wrapper {
+    position: relative;
+    padding-bottom: 62%;        /* lebih panjang (tinggi) dari 48% */
+    height: 0;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    max-width: 1800px;          /* lebih lebar */
+    max-height: 820px;          /* batas tinggi di layar besar */
+    margin: 0 auto;
+  }
   .video-wrapper iframe, .video-wrapper video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; background: #000; }
   .video-wrapper video { object-fit: contain; }
   .video-wrapper .placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #555; font-size: 0.95rem; }
-  .video-wrapper img.splash { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.5); }
-  .ad-gate { position: absolute; inset: 0; background: rgba(255,255,255,0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; text-align: center; padding: 20px; }
-  .ad-gate h3 { font-size: 1.3rem; margin-bottom: 8px; color: #111; }
-  .ad-gate p { color: #444; font-size: 0.9rem; margin-bottom: 18px; max-width: 320px; line-height: 1.5; }
-  .ad-gate button { padding: 14px 28px; background: #ff4757; color: #fff; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; }
-  .ad-gate button:hover { background: #e03e4e; }
-  .ad-gate button:disabled { background: #ccc; color: #666; cursor: not-allowed; }
-  .ad-gate .sub { font-size: 0.75rem; color: #666; margin-top: 12px; }
   .video-info { margin-top: 12px; padding: 0 4px; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
   .video-info .meta { flex: 1; min-width: 200px; }
   .video-info h2 { font-size: 1.15rem; font-weight: 500; line-height: 1.4; color: #111; }
@@ -49,8 +52,6 @@
   .action-row button { display: flex; align-items: center; gap: 6px; padding: 9px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; color: #111; background: #f7f7f7; }
   .action-row button:hover { background: #eee; }
   .action-row .like-btn.liked { background: #ff4757; color: #fff; border-color: #ff4757; }
-  .action-row .download-btn { background: #2d7a3e; color: #fff; border-color: #2d7a3e; }
-  .action-row .download-btn:hover { background: #3a9a4f; }
   .ad-banner { display: flex; justify-content: center; align-items: center; margin: 18px auto; min-height: 250px; max-width: 300px; background: #fafafa; border: 1px solid #e5e5e5; border-radius: 10px; overflow: hidden; }
   .ad-banner iframe { border: 0; display: block; }
   .share-row { margin-top: 12px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
@@ -66,18 +67,13 @@
   .share-grid .ico { font-size: 1.4rem; }
   .modal .close-btn { width: 100%; padding: 10px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 8px; color: #111; cursor: pointer; font-size: 0.85rem; }
   .modal .close-btn:hover { background: #e5e5e5; }
-  #downloadModal .dl-step { color: #ff4757; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px; text-transform: uppercase; }
-  #downloadModal h3 { margin-bottom: 10px; font-size: 1.15rem; color: #111; }
-  #downloadModal .dl-desc { color: #555; font-size: 0.88rem; line-height: 1.6; margin-bottom: 18px; }
-  #downloadModal .dl-progress { display: flex; gap: 6px; margin-bottom: 20px; }
-  #downloadModal .dl-progress .dot { flex: 1; height: 6px; background: #e5e5e5; border-radius: 3px; }
-  #downloadModal .dl-progress .dot.done { background: #4caf50; }
-  #downloadModal .dl-progress .dot.active { background: #ff4757; }
-  #downloadModal .dl-continue { width: 100%; padding: 14px; background: #ff4757; color: #fff; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-bottom: 10px; }
-  #downloadModal .dl-continue:disabled { background: #ccc; }
-  #downloadModal .dl-note { font-size: 0.75rem; color: #777; text-align: center; }
-  #downloadModal .dl-cancel { width: 100%; padding: 10px; background: transparent; color: #888; border: none; font-size: 0.82rem; cursor: pointer; }
-  @media (max-width: 600px) { .video-grid-container { grid-template-columns: repeat(2, 1fr); gap: 8px; } }
+  @media (max-width: 600px) {
+    .video-grid-container { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .video-wrapper { padding-bottom: 60%; border-radius: 0; margin: 0 -16px; max-height: none; }
+  }
+  @media (min-width: 1400px) {
+    .video-wrapper { max-height: 820px; }
+  }
 </style>
 </head>
 <body>
@@ -106,7 +102,6 @@
     <div class="action-row">
       <button class="like-btn" id="likeBtn" onclick="toggleLike()">👍 <span id="likeCount">0</span> Like</button>
       <button onclick="openShare()">🔗 Share</button>
-      <button class="download-btn" onclick="openDownloadGate()">⬇ Download</button>
     </div>
     <div class="ad-banner" id="adBannerMain">
       <script type="text/javascript">
@@ -125,19 +120,6 @@
     <h3>Bagikan Video</h3>
     <div class="share-grid" id="shareGrid"></div>
     <button class="close-btn" onclick="closeShare()">Tutup</button>
-  </div>
-</div>
-<div class="modal-bg" id="downloadModal">
-  <div class="modal">
-    <div class="dl-step" id="dlStepLabel">Langkah 1 dari 4</div>
-    <h3>Download Video</h3>
-    <p class="dl-desc" id="dlDesc">Silakan ikuti langkah berikut untuk melanjutkan proses download.</p>
-    <div class="dl-progress" id="dlProgress">
-      <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
-    </div>
-    <button class="dl-continue" id="dlContinueBtn" onclick="dlContinue()">Lanjut Download</button>
-    <div class="dl-note" id="dlNote">Setelah kembali dari halaman sponsor, proses download akan berlanjut otomatis.</div>
-    <button class="dl-cancel" onclick="closeDownloadGate()">Batal</button>
   </div>
 </div>
 <script type="module">
@@ -168,9 +150,6 @@
   let currentId = null;
   let currentVideo = null;
   let unsubVideo = null;
-  let dlStep = 1;
-  const DL_TOTAL_STEPS = 4;
-  const DL_SPONSOR_URL = 'https://benchform.org/1/9e72240f75b407d58c240d814380fcc7';
 
   const params = new URLSearchParams(location.search);
   currentId = params.get('id');
@@ -196,11 +175,8 @@
     return 'unknown';
   }
 
-  // === FUNGSI PROXY GAMBAR ===
-  // Jika gambar dari DoodStream diblokir (Hotlink), kita "titipkan" ke server proxy
   function proxyImage(url) {
     if (!url) return '';
-    // Hanya proxy gambar DoodStream
     if (url.includes('doodcdn') || url.includes('imgds.net') || url.includes('dood.')) {
       return 'https://wsrv.nl/?url=' + encodeURIComponent(url);
     }
@@ -245,14 +221,11 @@
 
     grid.innerHTML = videos.map(v => {
       let thumbUrl = v.thumb || v.splash || '';
-      // Jika tidak ada thumbnail manual, coba pakai DoodStream ID
       if (!thumbUrl && v.doodId) {
         thumbUrl = 'https://img.doodcdn.co/snaps/' + v.doodId + '.jpg';
       }
 
-      // Gunakan proxy jika linknya dari DoodStream
       const displayThumb = proxyImage(thumbUrl);
-
       const provider = getProvider(v);
       const isDirect = provider === 'direct';
       
@@ -301,21 +274,6 @@
   function startWatch(v) {
     currentVideo = v;
     currentId = v.id;
-    const wrapper = document.getElementById('playerWrapper');
-    // Gunakan proxy untuk splash juga
-    let splash = v.splash || v.thumb || '';
-    splash = proxyImage(splash);
-
-    wrapper.innerHTML = `
-      ${splash ? `<img class="splash" src="${escapeHtml(splash)}" alt="">` : ''}
-      <div class="ad-gate" id="adGate">
-        <h3>Tunggu Sebentar</h3>
-        <p>Buka iklan dulu <b>1 kali</b>, lalu balik nonton lagi di sini.</p>
-        <button id="gateBtn" onclick="openAdAndContinue()">🚀 Buka Iklan &amp; Lanjut</button>
-        <div class="sub" id="gateSub">Klik tombol di atas untuk melanjutkan</div>
-      </div>
-    `;
-    
     document.getElementById('videoTitle').textContent = v.title || 'Tanpa Judul';
     document.getElementById('shareUrl').value = location.origin + location.pathname + '?id=' + v.id;
     document.getElementById('shareRow').style.display = 'flex';
@@ -331,28 +289,9 @@
       const likedList = JSON.parse(localStorage.getItem('liked_videos') || '[]');
       document.getElementById('likeBtn').classList.toggle('liked', likedList.includes(v.id));
     });
-  }
 
-  window.openAdAndContinue = function () {
-    if (DL_SPONSOR_URL) window.open(DL_SPONSOR_URL, '_blank');
-    const btn = document.getElementById('gateBtn');
-    const sub = document.getElementById('gateSub');
-    btn.disabled = true;
-    btn.textContent = '⏳ Tunggu 5 detik...';
-    sub.textContent = 'Silakan kembali setelah iklan terbuka.';
-    let sisa = 5;
-    const t = setInterval(() => {
-      sisa--;
-      if (sisa > 0) { btn.textContent = `⏳ Tunggu ${sisa} detik...`; } 
-      else {
-        clearInterval(t);
-        btn.disabled = false;
-        btn.textContent = '▶ Lanjut Nonton';
-        btn.onclick = () => playVideoNow(currentVideo);
-        sub.textContent = 'Klik untuk mulai menonton.';
-      }
-    }, 1000);
-  };
+    playVideoNow(v);
+  }
 
   async function playVideoNow(v) {
     if (!v) return;
@@ -400,66 +339,6 @@
       localStorage.setItem('liked_videos', JSON.stringify(likedList));
     } catch (e) { alert('Gagal like: ' + e.message); }
   };
-
-  window.openDownloadGate = function () {
-    if (!currentVideo) return;
-    dlStep = 1;
-    updateDownloadUI();
-    document.getElementById('downloadModal').classList.add('show');
-  };
-  window.closeDownloadGate = function () { document.getElementById('downloadModal').classList.remove('show'); };
-  window.dlContinue = function () {
-    if (dlStep < DL_TOTAL_STEPS) {
-      if (DL_SPONSOR_URL) window.open(DL_SPONSOR_URL, '_blank');
-      dlStep++;
-      updateDownloadUI();
-    } else { startFinalDownload(); }
-  };
-
-  function updateDownloadUI() {
-    const dots = document.querySelectorAll('#dlProgress .dot');
-    dots.forEach((d, i) => {
-      d.classList.remove('done', 'active');
-      if (i + 1 < dlStep) d.classList.add('done');
-      else if (i + 1 === dlStep) d.classList.add('active');
-    });
-    if (dlStep <= DL_TOTAL_STEPS) {
-      document.getElementById('dlStepLabel').textContent = `Langkah ${dlStep} dari ${DL_TOTAL_STEPS}`;
-      document.getElementById('dlDesc').textContent = 'Silakan ikuti langkah berikut untuk melanjutkan proses download.';
-      document.getElementById('dlContinueBtn').textContent = 'Lanjut Download';
-      document.getElementById('dlNote').textContent = 'Setelah kembali dari halaman sponsor, proses download akan berlanjut otomatis.';
-      document.getElementById('dlNote').style.color = '#777';
-      document.getElementById('dlContinueBtn').disabled = false;
-    }
-  }
-
-  function startFinalDownload() {
-    const dots = document.querySelectorAll('#dlProgress .dot');
-    dots.forEach(d => { d.classList.remove('active'); d.classList.add('done'); });
-    document.getElementById('dlStepLabel').textContent = '✅ Download Siap';
-    document.getElementById('dlDesc').textContent = 'Terima kasih! Klik tombol di bawah untuk mulai mengunduh video.';
-    document.getElementById('dlContinueBtn').textContent = '⬇ Mulai Download';
-    document.getElementById('dlContinueBtn').disabled = false;
-    document.getElementById('dlContinueBtn').onclick = () => doActualDownload();
-    document.getElementById('dlNote').textContent = 'Video akan terbuka di tab baru / tersimpan otomatis.';
-    document.getElementById('dlNote').style.color = '#4caf50';
-  }
-
-  async function doActualDownload() {
-    if (!currentVideo) return;
-    const src = currentVideo.src || extractSrc(currentVideo.embed);
-    const provider = getProvider(currentVideo);
-    if (provider === 'abyss') {
-      closeDownloadGate();
-      alert('Maaf, video dari server Abyss tidak mendukung unduhan langsung.');
-      return;
-    }
-    let downloadUrl = src;
-    if (provider === 'direct' || isDirectVideoUrl(src)) { downloadUrl = src; } 
-    else if (/dood\.|doodstream/i.test(src)) { downloadUrl = src.replace(/\/(e|d)\//, '/d/'); }
-    window.open(downloadUrl, '_blank');
-    closeDownloadGate();
-  }
 
   window.openShare = function () {
     if (!currentVideo) return;
