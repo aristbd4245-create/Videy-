@@ -85,10 +85,15 @@
   .bulk-row .row-num { font-size: 0.8rem; color: #888; text-align: center; font-weight: bold; }
   .bulk-row input { padding: 8px; font-size: 0.85rem; }
   .bulk-row .del-btn { background: #ff4757; color: #fff; border: none; border-radius: 6px; padding: 8px; cursor: pointer; font-size: 0.8rem; }
+  /* Indikator thumbnail auto */
+  .bulk-row .thumb-indicator { font-size: 0.7rem; color: #4caf50; margin-top: -4px; grid-column: 3 / 6; display: none; }
+  .bulk-row .thumb-indicator.show { display: block; }
+  .bulk-row .thumb-indicator img { width: 48px; height: 27px; object-fit: cover; border-radius: 3px; vertical-align: middle; margin-right: 6px; border: 1px solid #ddd; }
 
   @media (max-width: 768px) {
     .bulk-row { grid-template-columns: 30px 1fr 40px; }
     .bulk-row input:nth-child(3), .bulk-row input:nth-child(4), .bulk-row input:nth-child(5) { grid-column: 2 / 3; }
+    .bulk-row .thumb-indicator { grid-column: 2 / 3; }
   }
 
   @media (max-width: 600px) {
@@ -273,11 +278,12 @@
       </div>
     </div>
 
-    <!-- FORM BULK EMBED (BARU: 10 LINK SEKALIGUS) -->
+    <!-- FORM BULK EMBED (10 LINK SEKALIGUS) -->
     <div class="single-form hidden" id="formBulkEmbed">
       <h3>📦 Upload Massal (Embed) - Hingga 10 Link</h3>
       <p class="hint" style="margin-bottom: 16px;">
-        Masukkan judul, link embed, link thumbnail (opsional), dan link splash (opsional) untuk setiap baris.
+        Masukkan judul, link embed, link thumbnail (opsional), dan link splash (opsional) untuk setiap baris.<br>
+        <strong>💡 Thumbnail & splash DoodStream akan terisi otomatis saat Anda menempel link embed DoodStream.</strong>
       </p>
 
       <div id="bulkRowsContainer">
@@ -580,174 +586,80 @@ Video Abyss | https://player.abyssplayer.com/8OgmaL-pR | https://i.imgur.com/con
     else badge.innerHTML = '<span class="provider-badge unknown">Bukan Link Video</span>';
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const ta = document.getElementById('sEmbed');
-    if (ta) ta.addEventListener('input', () => updateProviderBadge(extractSrc(ta.value)));
-    const du = document.getElementById('dUrl');
-    if (du) du.addEventListener('input', () => {
-      updateDirectBadge(du.value.trim());
-      const row = document.getElementById('directPreviewRow');
-      if (row) row.style.display = 'none';
-    });
-  });
+  // ==========================================
+  // AUTO-FILL THUMBNAIL DOODSTREAM UNTUK BULK EMBED
+  // ==========================================
+  function autoFillDoodThumb(row) {
+    const embedInput = row.querySelector('.b-embed');
+    const thumbInput = row.querySelector('.b-thumb');
+    const splashInput = row.querySelector('.b-splash');
+    const indicator = row.querySelector('.thumb-indicator');
 
-  window.detectProvider = function () {
-    const embed = document.getElementById('sEmbed').value.trim();
-    if (!embed) { alert('Tempel dulu URL / iframe.'); return; }
+    if (!embedInput || !thumbInput || !splashInput) return;
+
+    const embed = embedInput.value.trim();
     const src = extractSrc(embed);
     const info = extractVideoInfo(src);
-    if (!info) {
-      alert('Provider tidak terdeteksi.\n\nURL:\n' + src);
-      return;
-    }
-    alert('Provider: ' + info.provider + '\nID: ' + (info.id || '-'));
-  };
 
-  window.previewSingle = function () {
-    const thumb = document.getElementById('sThumb').value.trim();
-    const splash = document.getElementById('sSplash').value.trim();
-    
-    const embed = document.getElementById('sEmbed').value.trim();
-    if(embed) updateProviderBadge(extractSrc(embed));
+    // Hanya auto-isi untuk DoodStream
+    if (info && info.provider === 'doodstream' && info.id) {
+      const thumbUrl = autoThumb(info.id, 'doodstream');
+      const splashUrl = autoSplash(info.id, 'doodstream');
 
-    document.getElementById('previewRow').style.display = 'flex';
-    renderPreview('prevThumb', thumb, 0);
-    renderPreview('prevSplash', splash, 0);
-  };
-
-  function renderPreview(boxId, url, attempt) {
-    const box = document.getElementById(boxId);
-    if (!url) { box.innerHTML = '<span>Belum diisi</span>'; return; }
-    if (!/^https?:\/\//.test(url)) { box.innerHTML = '<span class="err">URL tidak valid</span>'; return; }
-
-    box.innerHTML = `<img src="${escapeHtml(url)}" alt="">`;
-    const img = box.querySelector('img');
-
-    img.onerror = () => {
-      const match = url.match(/\/(snaps|splash)\/([a-z0-9]+)\.(jpg|jpeg|png)/i);
-      if (match && attempt < 2) {
-        const kind = match[1];
-        const id = match[2];
-        const domains = kind === 'snaps' ? DOOD_THUMB_DOMAINS : DOOD_SPLASH_DOMAINS;
-        const nextUrl = domains[attempt + 1] + id + '.jpg';
-        renderPreview(boxId, nextUrl, attempt + 1);
-      } else {
-        box.innerHTML = '<span class="err">Gagal dimuat</span>';
+      // Isi otomatis hanya jika masih kosong atau sebelumnya diisi otomatis
+      if (!thumbInput.value.trim() || thumbInput.dataset.auto === 'true') {
+        thumbInput.value = thumbUrl;
+        thumbInput.dataset.auto = 'true';
       }
-    };
+      if (!splashInput.value.trim() || splashInput.dataset.auto === 'true') {
+        splashInput.value = splashUrl;
+        splashInput.dataset.auto = 'true';
+      }
+
+      // Tampilkan indikator thumbnail kecil
+      if (indicator) {
+        indicator.innerHTML = `<img src="${thumbUrl}" alt="" onerror="this.style.display='none'"> Auto: ${info.id}`;
+        indicator.classList.add('show');
+      }
+    } else {
+      // Jika bukan DoodStream, jangan hapus isian manual user
+      if (indicator) indicator.classList.remove('show');
+    }
   }
 
-  window.resetSingle = function () {
-    ['sTitle', 'sEmbed', 'sThumb', 'sSplash'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('sThumbFile').value = '';
-    document.getElementById('sSplashFile').value = '';
-    document.getElementById('sThumbUploadStatus').textContent = '';
-    document.getElementById('sSplashUploadStatus').textContent = '';
-    document.getElementById('previewRow').style.display = 'none';
-    document.getElementById('singleStatus').textContent = '';
-    updateProviderBadge('');
-  };
+  function attachDoodAutoFill(row) {
+    const embedInput = row.querySelector('.b-embed');
+    const thumbInput = row.querySelector('.b-thumb');
+    const splashInput = row.querySelector('.b-splash');
 
-  window.addSingle = async function () {
-    const title = document.getElementById('sTitle').value.trim();
-    const embed = document.getElementById('sEmbed').value.trim();
-    let thumb = document.getElementById('sThumb').value.trim();
-    let splash = document.getElementById('sSplash').value.trim();
-    const btn = document.getElementById('singleBtn');
-    const status = document.getElementById('singleStatus');
+    if (!embedInput) return;
 
-    if (!title) { alert('Judul wajib diisi.'); return; }
-    if (!embed) { alert('Kode embed / URL video wajib diisi.'); return; }
+    const handler = () => autoFillDoodThumb(row);
 
-    const src = extractSrc(embed);
-    if (!/^https?:\/\//.test(src)) { alert('Embed tidak valid.'); return; }
+    embedInput.addEventListener('input', handler);
+    embedInput.addEventListener('paste', () => setTimeout(handler, 50)); // tunggu paste selesai
 
-    const info = extractVideoInfo(src);
-    const provider = info ? info.provider : 'unknown';
-    const videoId = info ? info.id : '';
-
-    if (!thumb && provider === 'doodstream') thumb = autoThumb(videoId, 'doodstream');
-    if (!splash && provider === 'doodstream') splash = autoSplash(videoId, 'doodstream');
-
-    btn.disabled = true;
-    status.textContent = 'Menyimpan...';
-    try {
-      await addDoc(videosRef, {
-        title, embed, src,
-        thumb: thumb || '',
-        splash: splash || '',
-        doodId: provider === 'doodstream' ? videoId : '',
-        abyssId: provider === 'abyss' ? videoId : '',
-        provider: provider,
-        createdAt: Date.now(),
-        views: 0, likes: 0
+    // Jika user mengosongkan thumb/splash secara manual, lepas penanda auto
+    if (thumbInput) {
+      thumbInput.addEventListener('input', () => {
+        if (!thumbInput.value.trim()) {
+          thumbInput.dataset.auto = 'false';
+        } else if (thumbInput.dataset.auto !== 'true') {
+          // User mengetik manual, jangan ditimpa
+          thumbInput.dataset.auto = 'false';
+        }
       });
-      status.textContent = 'Video (' + provider + ') berhasil disimpan.';
-      resetSingle();
-      setTimeout(() => { status.textContent = ''; }, 4000);
-    } catch (e) {
-      status.textContent = 'Gagal: ' + e.message;
-    } finally {
-      btn.disabled = false;
     }
-  };
-
-  window.previewDirect = function () {
-    const url = document.getElementById('dUrl').value.trim();
-    if (!url) { alert('Tempel dulu link video langsung.'); return; }
-    if (!/^https?:\/\//.test(url)) { alert('URL tidak valid.'); return; }
-
-    const row = document.getElementById('directPreviewRow');
-    const box = document.getElementById('directVideoPreview');
-    row.style.display = 'flex';
-    box.innerHTML = `<video src="${escapeHtml(url)}" controls playsinline style="width:100%;height:100%;object-fit:contain;background:#000;"></video>`;
-  };
-
-  window.resetDirect = function () {
-    ['dTitle', 'dUrl', 'dThumb', 'dSplash'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('dThumbFile').value = '';
-    document.getElementById('dSplashFile').value = '';
-    document.getElementById('dThumbUploadStatus').textContent = '';
-    document.getElementById('dSplashUploadStatus').textContent = '';
-    document.getElementById('directPreviewRow').style.display = 'none';
-    document.getElementById('directStatus').textContent = '';
-    updateDirectBadge('');
-  };
-
-  window.addDirect = async function () {
-    const title = document.getElementById('dTitle').value.trim();
-    const url = document.getElementById('dUrl').value.trim();
-    const thumb = document.getElementById('dThumb').value.trim();
-    const splash = document.getElementById('dSplash').value.trim();
-    const btn = document.getElementById('directBtn');
-    const status = document.getElementById('directStatus');
-
-    if (!title) { alert('Judul wajib diisi.'); return; }
-    if (!url) { alert('Link video langsung wajib diisi.'); return; }
-    if (!/^https?:\/\//.test(url)) { alert('URL tidak valid.'); return; }
-
-    btn.disabled = true;
-    status.textContent = 'Menyimpan...';
-    try {
-      await addDoc(videosRef, {
-        title, embed: url, src: url,
-        thumb: thumb || '', splash: splash || '',
-        doodId: '', abyssId: '',
-        provider: 'direct',
-        createdAt: Date.now(),
-        views: 0, likes: 0
+    if (splashInput) {
+      splashInput.addEventListener('input', () => {
+        if (!splashInput.value.trim()) {
+          splashInput.dataset.auto = 'false';
+        } else if (splashInput.dataset.auto !== 'true') {
+          splashInput.dataset.auto = 'false';
+        }
       });
-      status.textContent = '✅ Video link langsung berhasil disimpan.';
-      status.style.color = '#4caf50';
-      resetDirect();
-      setTimeout(() => { status.textContent = ''; }, 4000);
-    } catch (e) {
-      status.textContent = 'Gagal: ' + e.message;
-      status.style.color = '#ff4757';
-    } finally {
-      btn.disabled = false;
     }
-  };
+  }
 
   // ==========================================
   // FUNGSI BULK EMBED (10 LINK SEKALIGUS)
@@ -768,8 +680,12 @@ Video Abyss | https://player.abyssplayer.com/8OgmaL-pR | https://i.imgur.com/con
       <input type="text" class="b-thumb" placeholder="Link Thumbnail (Opsional)">
       <input type="text" class="b-splash" placeholder="Link Splash (Opsional)">
       <button type="button" class="del-btn" onclick="removeBulkRow(this)">✕</button>
+      <div class="thumb-indicator"></div>
     `;
     container.appendChild(newRow);
+
+    // Pasang auto-fill untuk baris baru
+    attachDoodAutoFill(newRow);
   };
 
   window.removeBulkRow = function(btn) {
@@ -817,6 +733,7 @@ Video Abyss | https://player.abyssplayer.com/8OgmaL-pR | https://i.imgur.com/con
       const provider = info ? info.provider : 'unknown';
       const videoId = info ? info.id : '';
 
+      // Pastikan thumbnail & splash tetap terisi otomatis untuk DoodStream
       if (!thumb && provider === 'doodstream') thumb = autoThumb(videoId, 'doodstream');
       if (!splash && provider === 'doodstream') splash = autoSplash(videoId, 'doodstream');
 
@@ -857,8 +774,12 @@ Video Abyss | https://player.abyssplayer.com/8OgmaL-pR | https://i.imgur.com/con
           <input type="text" class="b-thumb" placeholder="Link Thumbnail (Opsional)">
           <input type="text" class="b-splash" placeholder="Link Splash (Opsional)">
           <button type="button" class="del-btn" onclick="removeBulkRow(this)">✕</button>
+          <div class="thumb-indicator"></div>
         </div>
       `;
+      // Pasang auto-fill lagi untuk baris baru setelah reset
+      const freshRow = document.querySelector('#bulkRowsContainer .bulk-row');
+      if (freshRow) attachDoodAutoFill(freshRow);
 
       if (invalid > 0) {
         status.textContent += ` (${invalid} baris dilewati karena tidak lengkap)`;
@@ -1057,6 +978,19 @@ Video Abyss | https://player.abyssplayer.com/8OgmaL-pR | https://i.imgur.com/con
       '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'
     }[m]));
   }
+
+  // ==========================================
+  // INISIALISASI AUTO-FILL UNTUK BARIS PERTAMA
+  // ==========================================
+  document.addEventListener('DOMContentLoaded', () => {
+    // Pasang event listener untuk form embed tunggal
+    const ta = document.getElementById('sEmbed');
+    if (ta) ta.addEventListener('input', () => updateProviderBadge(extractSrc(ta.value)));
+
+    // Pasang auto-fill DoodStream untuk baris bulk pertama
+    const firstRow = document.querySelector('#bulkRowsContainer .bulk-row');
+    if (firstRow) attachDoodAutoFill(firstRow);
+  });
 </script>
 </body>
 </html>
