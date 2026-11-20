@@ -50,8 +50,8 @@
   .action-row button { display: flex; align-items: center; gap: 6px; padding: 9px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; color: #111; background: #f7f7f7; }
   .action-row button:hover { background: #eee; }
   .action-row .like-btn.liked { background: #ff4757; color: #fff; border-color: #ff4757; }
-  .ad-banner { display: flex; justify-content: center; align-items: center; margin: 18px auto; min-height: 250px; max-width: 300px; background: #fafafa; border: 1px solid #e5e5e5; border-radius: 10px; overflow: hidden; }
-  .ad-banner iframe { border: 0; display: block; }
+  .ad-banner-frame-wrap { display: flex; justify-content: center; margin: 18px auto; max-width: 300px; min-height: 250px; background: #fafafa; border: 1px solid #e5e5e5; border-radius: 10px; overflow: hidden; }
+  .ad-banner-frame-wrap iframe { width: 300px; height: 250px; border: 0; display: block; background: transparent; }
   .share-row { margin-top: 12px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .share-row input { flex: 1; min-width: 160px; padding: 9px 12px; background: #fff; border: 1px solid #ddd; border-radius: 8px; color: #555; font-size: 0.8rem; }
   .share-row button { padding: 9px 16px; background: #ff4757; color: #fff; border: none; border-radius: 8px; font-size: 0.85rem; cursor: pointer; font-weight: 600; }
@@ -101,11 +101,13 @@
       <button class="like-btn" id="likeBtn" onclick="toggleLike()">👍 <span id="likeCount">0</span> Like</button>
       <button onclick="openShare()">🔗 Share</button>
     </div>
-    <div class="ad-banner" id="adBannerMain">
-      <script type="text/javascript">
-        atOptions = { 'key' : '2bc85909669de26b545e3502cadf231e', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
-      </script>
-      <script type="text/javascript" src="https://biomanos.org/22/2bc85909669de26b545e3502cadf231e"></script>
+    <!-- Banner biomanos.org diisolasi dalam iframe (sandbox) -->
+    <div class="ad-banner-frame-wrap">
+      <iframe id="adBannerFrame"
+              sandbox="allow-scripts allow-same-origin"
+              scrolling="no"
+              style="width:300px;height:250px;border:0;display:block;background:transparent;">
+      </iframe>
     </div>
     <div class="share-row" id="shareRow" style="display:none;">
       <input type="text" id="shareUrl" readonly>
@@ -144,23 +146,86 @@
     'https://imgds.net/snaps/'
   ];
 
-  // === POPUNDER: hanya 1x per sesi (tidak agresif) ===
+  // ==========================================
+  // IKLAN 1: Popunder benchform.org (maks 1x/hari/browser)
+  // ==========================================
   const POPUNDER_SRC = 'https://benchform.org/1/9e72240f75b407d58c240d814380fcc7';
-  const POPUNDER_KEY = 'popunder_shown';
+  const POPUNDER_KEY = 'popunder_shown_date';
+
+  // ==========================================
+  // IKLAN 2: Banner biomanos.org (diisolasi di iframe, maks 1x/hari/browser)
+  // ==========================================
+  const BANNER_SRC = 'https://biomanos.org/14/684edfbc0abd12a80ccb934dbdd668c1';
+  const BANNER_LOADED_KEY = 'banner_loaded_date';
 
   function loadPopunderOnce() {
-    // Jika sudah tampil di sesi ini, jangan muat lagi
-    if (sessionStorage.getItem(POPUNDER_KEY) === '1') return;
-    sessionStorage.setItem(POPUNDER_KEY, '1');
+    const today = new Date().toDateString();
+    try {
+      if (localStorage.getItem(POPUNDER_KEY) === today) return;
+      localStorage.setItem(POPUNDER_KEY, today);
+    } catch (e) {
+      if (sessionStorage.getItem(POPUNDER_KEY) === '1') return;
+      sessionStorage.setItem(POPUNDER_KEY, '1');
+    }
 
-    // Hapus skrip popunder lama (jika ada) supaya tidak menumpuk
-    document.querySelectorAll('script[data-popunder="1"]').forEach(function (s) { s.remove(); });
-    var s = document.createElement('script');
+    document.querySelectorAll('script[data-popunder="1"]').forEach(s => s.remove());
+    const s = document.createElement('script');
     s.src = POPUNDER_SRC;
     s.async = true;
     s.setAttribute('data-cfasync', 'false');
     s.setAttribute('data-popunder', '1');
     document.head.appendChild(s);
+  }
+
+  // Trigger popunder hanya pada interaksi pertama user
+  let popunderTriggered = false;
+  function triggerPopunderOnFirstInteraction() {
+    if (popunderTriggered) return;
+    popunderTriggered = true;
+    loadPopunderOnce();
+    document.removeEventListener('click', triggerPopunderOnFirstInteraction);
+    document.removeEventListener('touchstart', triggerPopunderOnFirstInteraction);
+  }
+  document.addEventListener('click', triggerPopunderOnFirstInteraction, { once: true });
+  document.addEventListener('touchstart', triggerPopunderOnFirstInteraction, { once: true });
+
+  // Muat banner biomanos.org ke dalam iframe terisolasi
+  function loadBannerOnce() {
+    const today = new Date().toDateString();
+    try {
+      if (localStorage.getItem(BANNER_LOADED_KEY) === today) return;
+      localStorage.setItem(BANNER_LOADED_KEY, today);
+    } catch (e) {
+      if (sessionStorage.getItem(BANNER_LOADED_KEY) === '1') return;
+      sessionStorage.setItem(BANNER_LOADED_KEY, '1');
+    }
+
+    const frame = document.getElementById('adBannerFrame');
+    if (!frame) return;
+
+    try {
+      const doc = frame.contentDocument || frame.contentWindow.document;
+      doc.open();
+      doc.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
+        <style>html,body{margin:0;padding:0;background:transparent;overflow:hidden;}</style>
+        </head><body>
+        <script data-cfasync="false" src="${BANNER_SRC}"><\/script>
+        </body></html>`);
+      doc.close();
+    } catch (e) {
+      console.warn('Banner iframe error:', e);
+    }
+  }
+
+  function cleanupAds() {
+    document.querySelectorAll('script[data-popunder="1"]').forEach(s => s.remove());
+    const frame = document.getElementById('adBannerFrame');
+    if (frame) {
+      try {
+        const doc = frame.contentDocument || frame.contentWindow.document;
+        doc.open(); doc.write(''); doc.close();
+      } catch (e) {}
+    }
   }
 
   let allVideos = [];
@@ -281,6 +346,7 @@
   }
 
   window.goBackToList = function() {
+    cleanupAds();
     if (unsubVideo) { unsubVideo(); unsubVideo = null; }
     document.getElementById('viewPlayer').classList.add('hidden');
     document.getElementById('viewList').classList.remove('hidden');
@@ -292,8 +358,7 @@
     currentVideo = v;
     currentId = v.id;
 
-    // === POPUNDER: hanya 1x per sesi ===
-    loadPopunderOnce();
+    // Popunder TIDAK dipanggil di sini (trigger via interaksi pertama user)
 
     document.getElementById('videoTitle').textContent = v.title || 'Tanpa Judul';
     document.getElementById('shareUrl').value = location.origin + location.pathname + '?id=' + v.id;
@@ -312,6 +377,9 @@
     });
 
     playVideoNow(v);
+
+    // Muat banner setelah 5 detik menonton (lazy, tidak mengganggu play)
+    setTimeout(loadBannerOnce, 5000);
   }
 
   async function playVideoNow(v) {
