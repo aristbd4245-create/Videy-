@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VideoStream</title>
-<!-- Popunder TIDAK dimuat di sini. Dimuat via loadPopunder() saat video dibuka -->
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: system-ui, -apple-system, sans-serif; background: #ffffff; color: #111; }
@@ -145,8 +144,15 @@
     'https://imgds.net/snaps/'
   ];
 
-  // === POPUNDER: dimuat ulang setiap kali video dibuka ===
+  // === POPUNDER: 1x setiap POPUNDER_EVERY video ===
   const POPUNDER_SRC = 'https://benchform.org/1/9e72240f75b407d58c240d814380fcc7';
+  const POPUNDER_EVERY = 2; // ubah ke 3 jika ingin 1 popunder per 3 video
+  const POPUNDER_COUNTER_KEY = 'popunder_view_counter';
+
+  function getPopunderCounter() {
+    var n = parseInt(sessionStorage.getItem(POPUNDER_COUNTER_KEY) || '0', 10);
+    return isNaN(n) ? 0 : n;
+  }
 
   function loadPopunder() {
     // Hapus skrip popunder lama (jika ada) supaya tidak menumpuk
@@ -157,6 +163,16 @@
     s.setAttribute('data-cfasync', 'false');
     s.setAttribute('data-popunder', '1');
     document.head.appendChild(s);
+  }
+
+  function maybeLoadPopunder() {
+    var count = getPopunderCounter();
+    // Tampilkan popunder saat counter % POPUNDER_EVERY === 0
+    // (video ke-1, ke-3, ke-5, dst. untuk POPUNDER_EVERY = 2)
+    if (count % POPUNDER_EVERY === 0) {
+      loadPopunder();
+    }
+    sessionStorage.setItem(POPUNDER_COUNTER_KEY, String(count + 1));
   }
 
   let allVideos = [];
@@ -288,8 +304,8 @@
     currentVideo = v;
     currentId = v.id;
 
-    // === MUAT ULANG POPUNDER SETIAP KALI VIDEO DIBUKA ===
-    loadPopunder();
+    // === POPUNDER: hanya dimuat setiap POPUNDER_EVERY video ===
+    maybeLoadPopunder();
 
     document.getElementById('videoTitle').textContent = v.title || 'Tanpa Judul';
     document.getElementById('shareUrl').value = location.origin + location.pathname + '?id=' + v.id;
