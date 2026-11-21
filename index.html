@@ -64,17 +64,16 @@
   .modal .close-btn { width: 100%; padding: 10px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 8px; color: #111; cursor: pointer; font-size: 0.85rem; }
   .modal .close-btn:hover { background: #e5e5e5; }
 
-  /* === SOSIAL BAR === */
+  /* === SOSIAL BAR (hanya di player) === */
   .socialbar-container {
     width: 100%;
     min-height: 60px;
-    margin: 12px auto;
+    margin: 0 0 12px 0;
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
   }
-  .socialbar-container.on-player { margin: 0 0 12px 0; }
 
   /* === BANNER 300x250 === */
   .banner-ad-wrap {
@@ -108,11 +107,6 @@
   <div id="viewList">
     <h2 style="font-size: 1.1rem; margin-bottom: 16px; color: #111;">Pilih Video</h2>
 
-    <!-- IKLAN 1: Sosial Bar di halaman list -->
-    <div class="socialbar-container" id="socialbarList">
-      <script data-cfasync="false" src="https://biomanos.org/14/684edfbc0abd12a80ccb934dbdd668c1"></script>
-    </div>
-
     <div class="video-grid-container" id="videoGrid">
       <div style="grid-column: 1 / -1; text-align: center; color: #888; padding: 20px;">Memuat daftar video...</div>
     </div>
@@ -121,8 +115,8 @@
   <div id="viewPlayer" class="hidden">
     <button class="btn-back" onclick="goBackToList()">← Kembali ke Daftar Video</button>
 
-    <!-- IKLAN 1b: Sosial Bar di halaman player -->
-    <div class="socialbar-container on-player" id="socialbarPlayer"></div>
+    <!-- Sosial Bar (hanya di player) -->
+    <div class="socialbar-container" id="socialbarPlayer"></div>
 
     <div class="video-wrapper" id="playerWrapper">
       <div class="placeholder">Memuat video...</div>
@@ -138,7 +132,7 @@
       <button onclick="openShare()">🔗 Share</button>
     </div>
 
-    <!-- IKLAN 2: Banner 300x250 di halaman player -->
+    <!-- Banner 300x250 -->
     <div class="banner-ad-wrap">
       <iframe id="bannerAdFrame"
               sandbox="allow-scripts allow-same-origin"
@@ -185,7 +179,7 @@
   ];
 
   // ==========================================
-  // IKLAN (2 saja)
+  // IKLAN (2 saja, sosial bar hanya di player)
   // ==========================================
   const SOCIALBAR_SRC = 'https://biomanos.org/14/684edfbc0abd12a80ccb934dbdd668c1';
   const BANNER_SRC = 'https://biomanos.org/22/2bc85909669de26b545e3502cadf231e';
@@ -356,7 +350,7 @@
     document.getElementById('viewList').classList.remove('hidden');
     history.pushState(null, '', location.pathname);
     document.getElementById('playerWrapper').innerHTML = '<div class="placeholder">Memuat video...</div>';
-    loadSocialBar('socialbarList');
+    // Tidak memuat sosial bar di list
   };
 
   function startWatch(v) {
@@ -379,7 +373,6 @@
       document.getElementById('likeBtn').classList.toggle('liked', likedList.includes(v.id));
     });
 
-    // Langsung render & play video (tanpa gate)
     renderVideoElement(v);
     tryPlayVideo();
   }
@@ -424,7 +417,6 @@
       try { await videoEl.play(); } catch (err) { videoEl.controls = true; }
     }
 
-    // Update view counter
     if (currentVideo && currentVideo.id) {
       const seen = JSON.parse(sessionStorage.getItem('viewed_videos') || '[]');
       if (!seen.includes(currentVideo.id)) {
@@ -434,7 +426,6 @@
       }
     }
 
-    // Muat banner setelah video play
     setTimeout(loadBannerOnce, 2000);
   }
 
@@ -493,9 +484,6 @@
   }
 
   loadVideos();
-  window.addEventListener('load', () => {
-    loadSocialBar('socialbarList');
-  });
 </script>
 </body>
 </html>
