@@ -64,7 +64,7 @@
   .modal .close-btn { width: 100%; padding: 10px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 8px; color: #111; cursor: pointer; font-size: 0.85rem; }
   .modal .close-btn:hover { background: #e5e5e5; }
 
-  /* === SOSIAL BAR CONTAINER === */
+  /* === SOSIAL BAR === */
   .socialbar-container {
     width: 100%;
     min-height: 60px;
@@ -90,180 +90,9 @@
   }
   .banner-ad-wrap iframe { width: 300px; height: 250px; border: 0; display: block; background: transparent; }
 
-  /* === PRE-ROLL GATE — overlay DI DALAM video-wrapper (bukan fullscreen) === */
-  .preroll-gate {
-    position: absolute;
-    inset: 0;
-    background: #000;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-    color: #fff;
-    text-align: center;
-    padding: 12px;
-    overflow-y: auto;
-    border-radius: inherit;
-  }
-  .preroll-gate .gate-label {
-    font-size: 0.7rem;
-    color: #aaa;
-    margin-bottom: 6px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-  .preroll-gate .gate-ad-slot {
-    width: 100%;
-    max-width: 340px;
-    min-height: 90px;
-    margin-bottom: 8px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    position: relative;
-    cursor: pointer;
-    background: #1a1a1a;
-    border: 1px dashed #444;
-    border-radius: 6px;
-  }
-  .preroll-gate .gate-ad-slot .ad-loading {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #888;
-    font-size: 0.75rem;
-    z-index: 1;
-    pointer-events: none;
-  }
-  .preroll-gate .gate-ad-slot .ad-loading.hidden { display: none; }
-  .preroll-gate .gate-countdown {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #ff4757;
-    margin-bottom: 4px;
-    font-variant-numeric: tabular-nums;
-  }
-  .preroll-gate .gate-text {
-    font-size: 0.78rem;
-    color: #ddd;
-    margin-bottom: 10px;
-    max-width: 300px;
-    line-height: 1.4;
-  }
-  .preroll-gate .gate-progress {
-    width: 180px;
-    height: 3px;
-    background: #333;
-    border-radius: 2px;
-    overflow: hidden;
-    margin-top: 10px;
-  }
-  .preroll-gate .gate-progress-bar {
-    height: 100%;
-    background: #ff4757;
-    width: 0%;
-    transition: width 0.1s linear;
-  }
-
-  /* Overlay klik di dalam gate */
-  .preroll-gate .gate-click-overlay {
-    position: absolute;
-    inset: 0;
-    z-index: 11;
-    cursor: pointer;
-    background: rgba(0, 0, 0, 0.55);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 4px;
-    color: #fff;
-    font-weight: 700;
-    font-size: 0.85rem;
-    text-align: center;
-    border-radius: 6px;
-    transition: opacity 0.2s;
-  }
-  .preroll-gate .gate-click-overlay .overlay-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    padding: 4px;
-  }
-  .preroll-gate .gate-click-overlay .overlay-icon { font-size: 1.4rem; }
-  .preroll-gate .gate-click-overlay .overlay-sub {
-    font-size: 0.68rem;
-    font-weight: 400;
-    color: #ddd;
-  }
-  .preroll-gate .gate-click-overlay .overlay-badge { display: none; }
-  .preroll-gate .gate-click-overlay.opened {
-    background: transparent;
-    pointer-events: none;
-    align-items: flex-start;
-    justify-content: flex-end;
-    padding: 6px;
-  }
-  .preroll-gate .gate-click-overlay.opened .overlay-content { display: none; }
-  .preroll-gate .gate-click-overlay.opened .overlay-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    background: #4caf50;
-    color: #fff;
-    font-size: 0.65rem;
-    font-weight: 700;
-    padding: 3px 7px;
-    border-radius: 4px;
-  }
-  @keyframes gatePulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7); }
-    50% { box-shadow: 0 0 0 8px rgba(255, 71, 87, 0); }
-  }
-  .preroll-gate .gate-click-overlay.pulse {
-    animation: gatePulse 1.2s infinite;
-    background: rgba(255, 71, 87, 0.25);
-  }
-  .preroll-gate .gate-btn {
-    display: inline-block;
-    padding: 9px 22px;
-    background: #555;
-    color: #aaa;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: not-allowed;
-    opacity: 0.6;
-    margin-top: 2px;
-  }
-  .preroll-gate .gate-btn.ready {
-    background: #ff4757;
-    color: #fff;
-    cursor: pointer;
-    opacity: 1;
-  }
-  .preroll-gate .gate-btn.ready:hover { background: #e03e4e; }
-  .preroll-gate .gate-opened-note {
-    display: none;
-    font-size: 0.72rem;
-    color: #4caf50;
-    margin-bottom: 8px;
-  }
-  .preroll-gate .gate-opened-note.show { display: block; }
-
   @media (max-width: 600px) {
     .video-grid-container { grid-template-columns: repeat(2, 1fr); gap: 8px; }
     .video-wrapper { padding-bottom: 60%; border-radius: 0; margin: 0 -16px; max-height: none; }
-    .preroll-gate { padding: 8px; }
-    .preroll-gate .gate-countdown { font-size: 1.6rem; }
-    .preroll-gate .gate-ad-slot { min-height: 70px; max-width: 280px; }
-    .preroll-gate .gate-text { font-size: 0.72rem; }
   }
   @media (min-width: 1400px) {
     .video-wrapper { max-height: 820px; }
@@ -279,7 +108,7 @@
   <div id="viewList">
     <h2 style="font-size: 1.1rem; margin-bottom: 16px; color: #111;">Pilih Video</h2>
 
-    <!-- SOSIAL BAR #1 — di halaman list, atas grid -->
+    <!-- IKLAN 1: Sosial Bar di halaman list -->
     <div class="socialbar-container" id="socialbarList">
       <script data-cfasync="false" src="https://biomanos.org/14/684edfbc0abd12a80ccb934dbdd668c1"></script>
     </div>
@@ -292,7 +121,7 @@
   <div id="viewPlayer" class="hidden">
     <button class="btn-back" onclick="goBackToList()">← Kembali ke Daftar Video</button>
 
-    <!-- SOSIAL BAR #2 — di halaman player, atas video wrapper -->
+    <!-- IKLAN 1b: Sosial Bar di halaman player -->
     <div class="socialbar-container on-player" id="socialbarPlayer"></div>
 
     <div class="video-wrapper" id="playerWrapper">
@@ -309,7 +138,7 @@
       <button onclick="openShare()">🔗 Share</button>
     </div>
 
-    <!-- BANNER 300x250 — di halaman player -->
+    <!-- IKLAN 2: Banner 300x250 di halaman player -->
     <div class="banner-ad-wrap">
       <iframe id="bannerAdFrame"
               sandbox="allow-scripts allow-same-origin"
@@ -356,19 +185,11 @@
   ];
 
   // ==========================================
-  // IKLAN
+  // IKLAN (2 saja)
   // ==========================================
   const SOCIALBAR_SRC = 'https://biomanos.org/14/684edfbc0abd12a80ccb934dbdd668c1';
   const BANNER_SRC = 'https://biomanos.org/22/2bc85909669de26b545e3502cadf231e';
   const BANNER_KEY = 'banner_loaded_date';
-
-  // Smartlink Adsterra
-  const AD_CLICK_URL = 'https://auctionr.org/4/6ae8f126de1b500bc55ac857d3622413';
-
-  function getAdClickUrl() {
-    if (AD_CLICK_URL && /^https?:\/\//.test(AD_CLICK_URL)) return AD_CLICK_URL;
-    return SOCIALBAR_SRC;
-  }
 
   function loadSocialBar(containerId) {
     const c = document.getElementById(containerId);
@@ -406,180 +227,6 @@
     } catch (e) {
       console.warn('Banner iframe error:', e);
     }
-  }
-
-  // ==========================================
-  // PRE-ROLL GATE 3 DETIK — DI DALAM #playerWrapper
-  // ==========================================
-  const GATE_SECONDS = 3;
-
-  function openAdTab(url) {
-    let newWin = null;
-    try {
-      newWin = window.open(url, '_blank', 'noopener,noreferrer');
-    } catch (err) {
-      console.warn('window.open error:', err);
-    }
-    const blocked = !newWin || typeof newWin.closed === 'undefined' || newWin.closed;
-    if (blocked) {
-      const a = document.createElement('a');
-      a.href = url;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      a.style.position = 'fixed';
-      a.style.top = '-9999px';
-      a.style.left = '-9999px';
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(() => { try { document.body.removeChild(a); } catch(e){} }, 100);
-      return false;
-    }
-    return true;
-  }
-
-  function showPrerollGate(video, onDone) {
-    const wrapper = document.getElementById('playerWrapper');
-    let remaining = GATE_SECONDS;
-    let adOpened = false;
-    let countdownDone = false;
-
-    // Gate dirender DI DALAM #playerWrapper (bukan fullscreen)
-    wrapper.innerHTML = `
-      <div class="preroll-gate" id="prerollGate">
-        <div class="gate-label">Buka Iklan Dulu</div>
-        <div class="gate-ad-slot" id="gateAdSlot">
-          <div class="ad-loading" id="adLoading">Memuat iklan...</div>
-          <div class="gate-click-overlay" id="gateClickOverlay" title="Buka iklan">
-            <div class="overlay-content">
-              <div class="overlay-icon">🎬</div>
-              <div>Buka iklan dulu sebelum menonton</div>
-              <div class="overlay-sub">(hanya 3 detik, lalu lanjut nonton)</div>
-            </div>
-            <div class="overlay-badge">✅ Iklan dibuka</div>
-          </div>
-        </div>
-        <div class="gate-countdown" id="gateCountdown">${remaining}</div>
-        <div class="gate-text" id="gateText">Buka iklan di atas untuk lanjut menonton. <span id="gateSecText">${remaining}</span> detik tersisa.</div>
-        <div class="gate-opened-note" id="gateOpenedNote"></div>
-        <button class="gate-btn" id="gateBtn" disabled>▶ Lanjut ke Video</button>
-        <div class="gate-progress"><div class="gate-progress-bar" id="gateBar"></div></div>
-      </div>
-    `;
-
-    const slot = document.getElementById('gateAdSlot');
-    const sb = document.createElement('script');
-    sb.src = SOCIALBAR_SRC;
-    sb.async = true;
-    sb.setAttribute('data-cfasync', 'false');
-    sb.setAttribute('data-socialbar', '1');
-    sb.onload = () => {
-      setTimeout(() => {
-        const loading = document.getElementById('adLoading');
-        if (loading) loading.classList.add('hidden');
-      }, 300);
-    };
-    sb.onerror = () => {
-      const loading = document.getElementById('adLoading');
-      if (loading) loading.textContent = 'Iklan gagal dimuat — tetap klik area di atas';
-    };
-    slot.appendChild(sb);
-
-    const countdownEl = document.getElementById('gateCountdown');
-    const secTextEl = document.getElementById('gateSecText');
-    const btn = document.getElementById('gateBtn');
-    const bar = document.getElementById('gateBar');
-    const overlay = document.getElementById('gateClickOverlay');
-    const openedNote = document.getElementById('gateOpenedNote');
-    const gateText = document.getElementById('gateText');
-
-    setTimeout(() => { bar.style.width = '100%'; }, 50);
-
-    function checkAndShowButton() {
-      if (!adOpened || !countdownDone) {
-        btn.disabled = true;
-        btn.classList.remove('ready');
-        return;
-      }
-      if (btn.classList.contains('ready')) return;
-      btn.disabled = false;
-      btn.classList.add('ready');
-      btn.textContent = '▶ Lanjut ke Video';
-      btn.focus();
-    }
-
-    overlay.addEventListener('click', (e) => {
-      if (adOpened) return;
-
-      const opened = openAdTab(getAdClickUrl());
-
-      e.preventDefault();
-      e.stopPropagation();
-
-      adOpened = true;
-
-      if (!opened) {
-        openedNote.textContent = '⚠️ Iklan terblokir browser — klik sekali lagi atau izinkan popup.';
-        openedNote.style.color = '#ffb347';
-        openedNote.classList.add('show');
-        adOpened = false;
-        return;
-      }
-
-      overlay.classList.remove('pulse');
-      overlay.classList.add('opened');
-
-      openedNote.textContent = '✅ Iklan terbuka di tab baru — tunggu 3 detik lalu lanjut';
-      openedNote.style.color = '#4caf50';
-      openedNote.classList.add('show');
-
-      checkAndShowButton();
-    });
-
-    const finish = () => {
-      clearInterval(interval);
-      const gate = document.getElementById('prerollGate');
-      if (gate) gate.remove();
-      window._cancelPrerollGate = null;
-      // Render video di wrapper (menggantikan gate)
-      onDone();
-    };
-
-    const interval = setInterval(() => {
-      remaining--;
-      if (remaining < 0) remaining = 0;
-      countdownEl.textContent = remaining;
-      if (secTextEl) secTextEl.textContent = remaining;
-
-      if (remaining <= 0 && !countdownDone) {
-        countdownDone = true;
-        clearInterval(interval);
-        countdownEl.textContent = '✓';
-        countdownEl.style.color = '#4caf50';
-
-        if (adOpened) {
-          gateText.textContent = '✅ Iklan sudah dibuka. Silakan lanjut menonton.';
-          gateText.style.color = '#4caf50';
-        } else {
-          gateText.innerHTML = '⏰ <strong>Buka iklan dulu ya — hanya butuh 3 detik</strong>';
-          gateText.style.color = '#ffb347';
-          overlay.classList.add('pulse');
-          btn.textContent = 'Buka Iklan Dulu';
-        }
-        checkAndShowButton();
-      }
-    }, 1000);
-
-    btn.addEventListener('click', () => {
-      if (btn.disabled) return;
-      finish();
-    }, { once: true });
-
-    window._cancelPrerollGate = () => {
-      clearInterval(interval);
-      const gate = document.getElementById('prerollGate');
-      if (gate) gate.remove();
-      window._cancelPrerollGate = null;
-    };
   }
 
   // ==========================================
@@ -704,7 +351,6 @@
   }
 
   window.goBackToList = function() {
-    if (window._cancelPrerollGate) { window._cancelPrerollGate(); }
     if (unsubVideo) { unsubVideo(); unsubVideo = null; }
     document.getElementById('viewPlayer').classList.add('hidden');
     document.getElementById('viewList').classList.remove('hidden');
@@ -733,14 +379,12 @@
       document.getElementById('likeBtn').classList.toggle('liked', likedList.includes(v.id));
     });
 
-    // Gate di dalam wrapper → setelah selesai, render video
-    showPrerollGate(v, () => {
-      playVideoNow(v);
-    });
+    // Langsung render & play video (tanpa gate)
+    renderVideoElement(v);
+    tryPlayVideo();
   }
 
-  async function playVideoNow(v) {
-    if (!v) return;
+  function renderVideoElement(v) {
     const src = v.src || extractSrc(v.embed);
     const provider = getProvider(v);
     const wrapper = document.getElementById('playerWrapper');
@@ -748,26 +392,50 @@
     if (provider === 'direct' || isDirectVideoUrl(src)) {
       let poster = v.thumb || v.splash || '';
       poster = proxyImage(poster);
-      
-      wrapper.innerHTML = `<video src="${escapeHtml(src)}" controls playsinline preload="metadata" ${poster ? `poster="${escapeHtml(poster)}"` : ''} style="position:absolute;top:0;left:0;width:100%;height:100%;background:#000;object-fit:contain;"></video>`;
-      const videoEl = wrapper.querySelector('video');
+      wrapper.innerHTML = `
+        <video id="mainVideo" src="${escapeHtml(src)}" controls playsinline preload="metadata"
+          ${poster ? `poster="${escapeHtml(poster)}"` : ''}
+          style="position:absolute;top:0;left:0;width:100%;height:100%;background:#000;object-fit:contain;">
+        </video>
+      `;
+      const videoEl = wrapper.querySelector('#mainVideo');
       if (videoEl) {
         videoEl.addEventListener('error', () => {
-          wrapper.innerHTML = `<div class="placeholder" style="color:#ff4757;flex-direction:column;gap:8px;padding:20px;text-align:center;"><span>Gagal memutar video langsung.</span><a href="${escapeHtml(src)}" target="_blank" rel="noopener" style="color:#229ED9;font-size:0.8rem;">Buka di tab baru</a></div>`;
+          wrapper.innerHTML = `<div class="placeholder" style="color:#ff4757;flex-direction:column;gap:8px;padding:20px;text-align:center;">
+            <span>Gagal memutar video langsung.</span>
+            <a href="${escapeHtml(src)}" target="_blank" rel="noopener" style="color:#229ED9;font-size:0.8rem;">Buka di tab baru</a>
+          </div>`;
         });
       }
     } else {
-      wrapper.innerHTML = `<iframe src="${escapeHtml(src)}" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; encrypted-media"></iframe>`;
+      wrapper.innerHTML = `
+        <iframe id="mainIframe" src="${escapeHtml(src)}" scrolling="no" frameborder="0"
+          allowfullscreen="true" allow="autoplay; encrypted-media"
+          style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;background:#000;">
+        </iframe>
+      `;
+    }
+  }
+
+  async function tryPlayVideo() {
+    const wrapper = document.getElementById('playerWrapper');
+    const videoEl = wrapper.querySelector('#mainVideo');
+    if (videoEl) {
+      try { await videoEl.play(); } catch (err) { videoEl.controls = true; }
     }
 
+    // Update view counter
+    if (currentVideo && currentVideo.id) {
+      const seen = JSON.parse(sessionStorage.getItem('viewed_videos') || '[]');
+      if (!seen.includes(currentVideo.id)) {
+        seen.push(currentVideo.id);
+        sessionStorage.setItem('viewed_videos', JSON.stringify(seen));
+        try { await updateDoc(doc(db, 'videos', currentVideo.id), { views: increment(1) }); } catch (e) {}
+      }
+    }
+
+    // Muat banner setelah video play
     setTimeout(loadBannerOnce, 2000);
-
-    const seen = JSON.parse(sessionStorage.getItem('viewed_videos') || '[]');
-    if (!seen.includes(v.id)) {
-      seen.push(v.id);
-      sessionStorage.setItem('viewed_videos', JSON.stringify(seen));
-      try { await updateDoc(doc(db, 'videos', v.id), { views: increment(1) }); } catch (e) {}
-    }
   }
 
   window.toggleLike = async function () {
