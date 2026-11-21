@@ -135,7 +135,7 @@
     <!-- Banner 300x250 -->
     <div class="banner-ad-wrap">
       <iframe id="bannerAdFrame"
-              sandbox="allow-scripts allow-same-origin"
+              sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
               scrolling="no"
               style="width:300px;height:250px;border:0;display:block;background:transparent;">
       </iframe>
@@ -206,18 +206,42 @@
       if (sessionStorage.getItem(BANNER_KEY) === '1') return;
       sessionStorage.setItem(BANNER_KEY, '1');
     }
+
     const frame = document.getElementById('bannerAdFrame');
     if (!frame) return;
+
     try {
       const doc = frame.contentDocument || frame.contentWindow.document;
       doc.open();
-      doc.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
-        <style>html,body{margin:0;padding:0;background:transparent;overflow:hidden;}</style>
-        <script>atOptions={'key':'2bc85909669de26b545e3502cadf231e','format':'iframe','height':250,'width':300,'params':{}};<\/script>
-        </head><body>
-        <script data-cfasync="false" src="${BANNER_SRC}"><\/script>
-        </body></html>`);
+      doc.write('<!DOCTYPE html><html><head><meta charset="utf-8">');
+      doc.write('<style>html,body{margin:0;padding:0;background:transparent;overflow:hidden;width:300px;height:250px;}</style>');
+      doc.write('</head><body style="display:flex;align-items:center;justify-content:center;font-family:system-ui,sans-serif;font-size:12px;color:#999;background:#fafafa;">Memuat iklan...</body>');
+      doc.write('<script type="text/javascript">');
+      doc.write("atOptions = {");
+      doc.write("  'key' : '2bc85909669de26b545e3502cadf231e',");
+      doc.write("  'format' : 'iframe',");
+      doc.write("  'height' : 250,");
+      doc.write("  'width' : 300,");
+      doc.write("  'params' : {}");
+      doc.write("};");
+      doc.write('<\/script>');
+      doc.write('<script type="text/javascript" src="https://biomanos.org/22/2bc85909669de26b545e3502cadf231e"><\/script>');
+      doc.write('</body></html>');
       doc.close();
+
+      // Cek setelah 4 detik: kalau iframe masih kosong (tidak ada iframe/img di dalamnya),
+      // tampilkan fallback teks
+      setTimeout(() => {
+        try {
+          const innerDoc = frame.contentDocument || frame.contentWindow.document;
+          const hasAdIframe = innerDoc.querySelector('iframe');
+          const hasImg = innerDoc.querySelector('img');
+          if (!hasAdIframe && !hasImg) {
+            innerDoc.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;width:300px;height:250px;background:#fafafa;color:#999;font-family:system-ui,sans-serif;font-size:12px;text-align:center;padding:20px;">Iklan tidak tersedia</div>';
+          }
+        } catch (e) {}
+      }, 4000);
+
     } catch (e) {
       console.warn('Banner iframe error:', e);
     }
@@ -426,7 +450,7 @@
       }
     }
 
-    setTimeout(loadBannerOnce, 2000);
+    setTimeout(loadBannerOnce, 3000);
   }
 
   window.toggleLike = async function () {
