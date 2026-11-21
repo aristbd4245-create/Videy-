@@ -90,7 +90,7 @@
   }
   .banner-ad-wrap iframe { width: 300px; height: 250px; border: 0; display: block; background: transparent; }
 
-  /* === PRE-ROLL GATE 3 DETIK === */
+  /* === PRE-ROLL GATE — overlay DI DALAM video-wrapper (bukan fullscreen) === */
   .preroll-gate {
     position: absolute;
     inset: 0;
@@ -102,21 +102,22 @@
     z-index: 10;
     color: #fff;
     text-align: center;
-    padding: 20px;
+    padding: 12px;
     overflow-y: auto;
+    border-radius: inherit;
   }
   .preroll-gate .gate-label {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: #aaa;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     letter-spacing: 1px;
     text-transform: uppercase;
   }
   .preroll-gate .gate-ad-slot {
     width: 100%;
-    max-width: 360px;
-    min-height: 120px;
-    margin-bottom: 12px;
+    max-width: 340px;
+    min-height: 90px;
+    margin-bottom: 8px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -134,32 +135,32 @@
     align-items: center;
     justify-content: center;
     color: #888;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     z-index: 1;
     pointer-events: none;
   }
   .preroll-gate .gate-ad-slot .ad-loading.hidden { display: none; }
   .preroll-gate .gate-countdown {
-    font-size: 2.4rem;
+    font-size: 2rem;
     font-weight: 700;
     color: #ff4757;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
     font-variant-numeric: tabular-nums;
   }
   .preroll-gate .gate-text {
-    font-size: 0.85rem;
+    font-size: 0.78rem;
     color: #ddd;
-    margin-bottom: 14px;
-    max-width: 320px;
+    margin-bottom: 10px;
+    max-width: 300px;
     line-height: 1.4;
   }
   .preroll-gate .gate-progress {
-    width: 200px;
-    height: 4px;
+    width: 180px;
+    height: 3px;
     background: #333;
     border-radius: 2px;
     overflow: hidden;
-    margin-top: 12px;
+    margin-top: 10px;
   }
   .preroll-gate .gate-progress-bar {
     height: 100%;
@@ -168,7 +169,7 @@
     transition: width 0.1s linear;
   }
 
-  /* Overlay semi-transparan untuk tangkap klik iklan */
+  /* Overlay klik di dalam gate */
   .preroll-gate .gate-click-overlay {
     position: absolute;
     inset: 0;
@@ -179,10 +180,10 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
     color: #fff;
     font-weight: 700;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     text-align: center;
     border-radius: 6px;
     transition: opacity 0.2s;
@@ -191,19 +192,16 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
+    padding: 4px;
   }
-  .preroll-gate .gate-click-overlay .overlay-icon {
-    font-size: 1.6rem;
-  }
+  .preroll-gate .gate-click-overlay .overlay-icon { font-size: 1.4rem; }
   .preroll-gate .gate-click-overlay .overlay-sub {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     font-weight: 400;
     color: #ddd;
   }
   .preroll-gate .gate-click-overlay .overlay-badge { display: none; }
-
-  /* Overlay berubah jadi badge setelah diklik */
   .preroll-gate .gate-click-overlay.opened {
     background: transparent;
     pointer-events: none;
@@ -211,22 +209,18 @@
     justify-content: flex-end;
     padding: 6px;
   }
-  .preroll-gate .gate-click-overlay.opened .overlay-content {
-    display: none;
-  }
+  .preroll-gate .gate-click-overlay.opened .overlay-content { display: none; }
   .preroll-gate .gate-click-overlay.opened .overlay-badge {
     display: inline-flex;
     align-items: center;
     gap: 4px;
     background: #4caf50;
     color: #fff;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: 700;
-    padding: 4px 8px;
+    padding: 3px 7px;
     border-radius: 4px;
   }
-
-  /* Pulse animation untuk menarik perhatian */
   @keyframes gatePulse {
     0%, 100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7); }
     50% { box-shadow: 0 0 0 8px rgba(255, 71, 87, 0); }
@@ -235,16 +229,14 @@
     animation: gatePulse 1.2s infinite;
     background: rgba(255, 71, 87, 0.25);
   }
-
-  /* Tombol gate: disabled → ready */
   .preroll-gate .gate-btn {
     display: inline-block;
-    padding: 12px 28px;
+    padding: 9px 22px;
     background: #555;
     color: #aaa;
     border: none;
     border-radius: 8px;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     font-weight: 600;
     cursor: not-allowed;
     opacity: 0.6;
@@ -257,19 +249,21 @@
     opacity: 1;
   }
   .preroll-gate .gate-btn.ready:hover { background: #e03e4e; }
-
-  /* Status "iklan sudah dibuka" */
   .preroll-gate .gate-opened-note {
     display: none;
-    font-size: 0.8rem;
+    font-size: 0.72rem;
     color: #4caf50;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
   }
   .preroll-gate .gate-opened-note.show { display: block; }
 
   @media (max-width: 600px) {
     .video-grid-container { grid-template-columns: repeat(2, 1fr); gap: 8px; }
     .video-wrapper { padding-bottom: 60%; border-radius: 0; margin: 0 -16px; max-height: none; }
+    .preroll-gate { padding: 8px; }
+    .preroll-gate .gate-countdown { font-size: 1.6rem; }
+    .preroll-gate .gate-ad-slot { min-height: 70px; max-width: 280px; }
+    .preroll-gate .gate-text { font-size: 0.72rem; }
   }
   @media (min-width: 1400px) {
     .video-wrapper { max-height: 820px; }
@@ -368,7 +362,7 @@
   const BANNER_SRC = 'https://biomanos.org/22/2bc85909669de26b545e3502cadf231e';
   const BANNER_KEY = 'banner_loaded_date';
 
-  // Smartlink Adsterra (ganti jika perlu)
+  // Smartlink Adsterra
   const AD_CLICK_URL = 'https://auctionr.org/4/6ae8f126de1b500bc55ac857d3622413';
 
   function getAdClickUrl() {
@@ -415,7 +409,7 @@
   }
 
   // ==========================================
-  // PRE-ROLL GATE 3 DETIK
+  // PRE-ROLL GATE 3 DETIK — DI DALAM #playerWrapper
   // ==========================================
   const GATE_SECONDS = 3;
 
@@ -443,12 +437,13 @@
     return true;
   }
 
-  function showPrerollGate(onDone) {
+  function showPrerollGate(video, onDone) {
     const wrapper = document.getElementById('playerWrapper');
     let remaining = GATE_SECONDS;
     let adOpened = false;
     let countdownDone = false;
 
+    // Gate dirender DI DALAM #playerWrapper (bukan fullscreen)
     wrapper.innerHTML = `
       <div class="preroll-gate" id="prerollGate">
         <div class="gate-label">Buka Iklan Dulu</div>
@@ -545,6 +540,7 @@
       const gate = document.getElementById('prerollGate');
       if (gate) gate.remove();
       window._cancelPrerollGate = null;
+      // Render video di wrapper (menggantikan gate)
       onDone();
     };
 
@@ -737,7 +733,8 @@
       document.getElementById('likeBtn').classList.toggle('liked', likedList.includes(v.id));
     });
 
-    showPrerollGate(() => {
+    // Gate di dalam wrapper → setelah selesai, render video
+    showPrerollGate(v, () => {
       playVideoNow(v);
     });
   }
