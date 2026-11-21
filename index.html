@@ -50,8 +50,6 @@
   .action-row button { display: flex; align-items: center; gap: 6px; padding: 9px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; color: #111; background: #f7f7f7; }
   .action-row button:hover { background: #eee; }
   .action-row .like-btn.liked { background: #ff4757; color: #fff; border-color: #ff4757; }
-  .ad-banner-frame-wrap { display: flex; justify-content: center; margin: 18px auto; max-width: 300px; min-height: 250px; background: #fafafa; border: 1px solid #e5e5e5; border-radius: 10px; overflow: hidden; }
-  .ad-banner-frame-wrap iframe { width: 300px; height: 250px; border: 0; display: block; background: transparent; }
   .share-row { margin-top: 12px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .share-row input { flex: 1; min-width: 160px; padding: 9px 12px; background: #fff; border: 1px solid #ddd; border-radius: 8px; color: #555; font-size: 0.8rem; }
   .share-row button { padding: 9px 16px; background: #ff4757; color: #fff; border: none; border-radius: 8px; font-size: 0.85rem; cursor: pointer; font-weight: 600; }
@@ -65,6 +63,68 @@
   .share-grid .ico { font-size: 1.4rem; }
   .modal .close-btn { width: 100%; padding: 10px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 8px; color: #111; cursor: pointer; font-size: 0.85rem; }
   .modal .close-btn:hover { background: #e5e5e5; }
+
+  /* === PRE-ROLL AD OVERLAY === */
+  .preroll-overlay {
+    position: absolute;
+    inset: 0;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+  }
+  .preroll-overlay .preroll-title {
+    font-size: 0.85rem;
+    color: #aaa;
+    margin-bottom: 16px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .preroll-overlay .preroll-countdown {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #ff4757;
+    margin-bottom: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+  .preroll-overlay .preroll-text {
+    font-size: 0.9rem;
+    color: #ddd;
+    margin-bottom: 20px;
+  }
+  .preroll-overlay .preroll-skip {
+    display: none;
+    padding: 12px 28px;
+    background: #ff4757;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .preroll-overlay .preroll-skip:hover { background: #e03e4e; }
+  .preroll-overlay .preroll-skip.show { display: inline-block; }
+  .preroll-overlay .preroll-progress {
+    width: 200px;
+    height: 4px;
+    background: #333;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 16px;
+  }
+  .preroll-overlay .preroll-progress-bar {
+    height: 100%;
+    background: #ff4757;
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+
   @media (max-width: 600px) {
     .video-grid-container { grid-template-columns: repeat(2, 1fr); gap: 8px; }
     .video-wrapper { padding-bottom: 60%; border-radius: 0; margin: 0 -16px; max-height: none; }
@@ -100,14 +160,6 @@
     <div class="action-row">
       <button class="like-btn" id="likeBtn" onclick="toggleLike()">👍 <span id="likeCount">0</span> Like</button>
       <button onclick="openShare()">🔗 Share</button>
-    </div>
-    <!-- Banner biomanos.org diisolasi dalam iframe (sandbox) -->
-    <div class="ad-banner-frame-wrap">
-      <iframe id="adBannerFrame"
-              sandbox="allow-scripts allow-same-origin"
-              scrolling="no"
-              style="width:300px;height:250px;border:0;display:block;background:transparent;">
-      </iframe>
     </div>
     <div class="share-row" id="shareRow" style="display:none;">
       <input type="text" id="shareUrl" readonly>
@@ -147,27 +199,42 @@
   ];
 
   // ==========================================
-  // IKLAN 1: Popunder benchform.org (maks 1x/hari/browser)
+  // POPUNDER benchform.org (kurang agresif)
+  // - Maks 1x per hari per browser
+  // - Delay 8 detik setelah interaksi
+  // - Trigger di halaman list (klik video) & player
+  // - Tidak trigger dari tombol Like/Share/Back
+  // - Hormati Save-Data / reduced-motion
   // ==========================================
   const POPUNDER_SRC = 'https://benchform.org/1/9e72240f75b407d58c240d814380fcc7';
   const POPUNDER_KEY = 'popunder_shown_date';
+  const POPUNDER_DELAY_MS = 8000;
 
-  // ==========================================
-  // IKLAN 2: Banner biomanos.org (diisolasi di iframe, maks 1x/hari/browser)
-  // ==========================================
-  const BANNER_SRC = 'https://biomanos.org/14/684edfbc0abd12a80ccb934dbdd668c1';
-  const BANNER_LOADED_KEY = 'banner_loaded_date';
+  let popunderScheduled = false;
+  let popunderTimer = null;
 
-  function loadPopunderOnce() {
+  function isPopunderAllowed() {
     const today = new Date().toDateString();
     try {
-      if (localStorage.getItem(POPUNDER_KEY) === today) return;
+      if (localStorage.getItem(POPUNDER_KEY) === today) return false;
+    } catch (e) {
+      if (sessionStorage.getItem(POPUNDER_KEY) === '1') return false;
+    }
+    if (navigator.connection && navigator.connection.saveData) return false;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+    return true;
+  }
+
+  function markPopunderShown() {
+    const today = new Date().toDateString();
+    try {
       localStorage.setItem(POPUNDER_KEY, today);
     } catch (e) {
-      if (sessionStorage.getItem(POPUNDER_KEY) === '1') return;
       sessionStorage.setItem(POPUNDER_KEY, '1');
     }
+  }
 
+  function loadPopunderNow() {
     document.querySelectorAll('script[data-popunder="1"]').forEach(s => s.remove());
     const s = document.createElement('script');
     s.src = POPUNDER_SRC;
@@ -175,59 +242,107 @@
     s.setAttribute('data-cfasync', 'false');
     s.setAttribute('data-popunder', '1');
     document.head.appendChild(s);
+    markPopunderShown();
   }
 
-  // Trigger popunder hanya pada interaksi pertama user
-  let popunderTriggered = false;
-  function triggerPopunderOnFirstInteraction() {
-    if (popunderTriggered) return;
-    popunderTriggered = true;
-    loadPopunderOnce();
-    document.removeEventListener('click', triggerPopunderOnFirstInteraction);
-    document.removeEventListener('touchstart', triggerPopunderOnFirstInteraction);
+  function schedulePopunder() {
+    if (popunderScheduled) return;
+    if (!isPopunderAllowed()) return;
+    popunderScheduled = true;
+    if (popunderTimer) clearTimeout(popunderTimer);
+    popunderTimer = setTimeout(() => {
+      if (!isPopunderAllowed()) return;
+      loadPopunderNow();
+    }, POPUNDER_DELAY_MS);
   }
-  document.addEventListener('click', triggerPopunderOnFirstInteraction, { once: true });
-  document.addEventListener('touchstart', triggerPopunderOnFirstInteraction, { once: true });
 
-  // Muat banner biomanos.org ke dalam iframe terisolasi
-  function loadBannerOnce() {
-    const today = new Date().toDateString();
-    try {
-      if (localStorage.getItem(BANNER_LOADED_KEY) === today) return;
-      localStorage.setItem(BANNER_LOADED_KEY, today);
-    } catch (e) {
-      if (sessionStorage.getItem(BANNER_LOADED_KEY) === '1') return;
-      sessionStorage.setItem(BANNER_LOADED_KEY, '1');
+  function cancelPopunderIfPending() {
+    if (popunderTimer) {
+      clearTimeout(popunderTimer);
+      popunderTimer = null;
     }
-
-    const frame = document.getElementById('adBannerFrame');
-    if (!frame) return;
-
-    try {
-      const doc = frame.contentDocument || frame.contentWindow.document;
-      doc.open();
-      doc.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
-        <style>html,body{margin:0;padding:0;background:transparent;overflow:hidden;}</style>
-        </head><body>
-        <script data-cfasync="false" src="${BANNER_SRC}"><\/script>
-        </body></html>`);
-      doc.close();
-    } catch (e) {
-      console.warn('Banner iframe error:', e);
-    }
+    popunderScheduled = false;
   }
 
-  function cleanupAds() {
-    document.querySelectorAll('script[data-popunder="1"]').forEach(s => s.remove());
-    const frame = document.getElementById('adBannerFrame');
-    if (frame) {
-      try {
-        const doc = frame.contentDocument || frame.contentWindow.document;
-        doc.open(); doc.write(''); doc.close();
-      } catch (e) {}
-    }
+  // Klik di mana saja (kecuali tombol aksi) => jadwalkan popunder
+  document.addEventListener('click', (e) => {
+    const t = e.target;
+    if (!t || !t.closest) return;
+    if (t.closest('.action-row') || t.closest('.share-row') || t.closest('.btn-back') || t.closest('.modal') || t.closest('.preroll-overlay')) return;
+    schedulePopunder();
+  });
+
+  document.addEventListener('touchstart', (e) => {
+    const t = e.target;
+    if (!t || !t.closest) return;
+    if (t.closest('.action-row') || t.closest('.share-row') || t.closest('.btn-back') || t.closest('.modal') || t.closest('.preroll-overlay')) return;
+    schedulePopunder();
+  }, { passive: true });
+
+  // ==========================================
+  // PRE-ROLL AD 4 DETIK SEBELUM VIDEO PLAY
+  // ==========================================
+  const PREROLL_SECONDS = 4;
+
+  function showPrerollAd(onDone) {
+    const wrapper = document.getElementById('playerWrapper');
+    let remaining = PREROLL_SECONDS;
+
+    wrapper.innerHTML = `
+      <div class="preroll-overlay" id="prerollOverlay">
+        <div class="preroll-title">Iklan Sebentar</div>
+        <div class="preroll-countdown" id="prerollCountdown">${remaining}</div>
+        <div class="preroll-text">Video akan tersedia dalam <span id="prerollSecText">${remaining}</span> detik</div>
+        <button class="preroll-skip" id="prerollSkipBtn">▶ Lanjut ke Video</button>
+        <div class="preroll-progress"><div class="preroll-progress-bar" id="prerollBar"></div></div>
+      </div>
+    `;
+
+    const countdownEl = document.getElementById('prerollCountdown');
+    const secTextEl = document.getElementById('prerollSecText');
+    const skipBtn = document.getElementById('prerollSkipBtn');
+    const bar = document.getElementById('prerollBar');
+
+    // progres bar dari 0% -> 100%
+    setTimeout(() => { bar.style.width = '100%'; }, 50);
+
+    let interval = setInterval(() => {
+      remaining--;
+      if (remaining < 0) remaining = 0;
+      countdownEl.textContent = remaining;
+      secTextEl.textContent = remaining;
+      if (remaining <= 0) {
+        clearInterval(interval);
+        countdownEl.textContent = '✓';
+        countdownEl.style.color = '#4caf50';
+        secTextEl.parentElement.textContent = 'Iklan selesai. Silakan lanjut menonton.';
+        skipBtn.classList.add('show');
+        skipBtn.focus();
+      }
+    }, 1000);
+
+    // Tombol lanjut -> hentikan interval & panggil callback
+    const finish = () => {
+      clearInterval(interval);
+      const overlay = document.getElementById('prerollOverlay');
+      if (overlay) overlay.remove();
+      onDone();
+    };
+
+    skipBtn.addEventListener('click', finish, { once: true });
+
+    // Kalau user back sebelum selesai -> batalkan semuanya
+    window._cancelPreroll = () => {
+      clearInterval(interval);
+      const overlay = document.getElementById('prerollOverlay');
+      if (overlay) overlay.remove();
+      window._cancelPreroll = null;
+    };
   }
 
+  // ==========================================
+  // DATA & STATE
+  // ==========================================
   let allVideos = [];
   let currentId = null;
   let currentVideo = null;
@@ -346,7 +461,8 @@
   }
 
   window.goBackToList = function() {
-    cleanupAds();
+    if (window._cancelPreroll) { window._cancelPreroll(); }
+    cancelPopunderIfPending();
     if (unsubVideo) { unsubVideo(); unsubVideo = null; }
     document.getElementById('viewPlayer').classList.add('hidden');
     document.getElementById('viewList').classList.remove('hidden');
@@ -357,8 +473,6 @@
   function startWatch(v) {
     currentVideo = v;
     currentId = v.id;
-
-    // Popunder TIDAK dipanggil di sini (trigger via interaksi pertama user)
 
     document.getElementById('videoTitle').textContent = v.title || 'Tanpa Judul';
     document.getElementById('shareUrl').value = location.origin + location.pathname + '?id=' + v.id;
@@ -376,10 +490,11 @@
       document.getElementById('likeBtn').classList.toggle('liked', likedList.includes(v.id));
     });
 
-    playVideoNow(v);
-
-    // Muat banner setelah 5 detik menonton (lazy, tidak mengganggu play)
-    setTimeout(loadBannerOnce, 5000);
+    // === PRE-ROLL 4 DETIK: tampilkan overlay dulu, baru play video ===
+    showPrerollAd(() => {
+      // User klik "Lanjut ke Video" setelah 4 detik
+      playVideoNow(v);
+    });
   }
 
   async function playVideoNow(v) {
