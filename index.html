@@ -64,8 +64,34 @@
   .modal .close-btn { width: 100%; padding: 10px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 8px; color: #111; cursor: pointer; font-size: 0.85rem; }
   .modal .close-btn:hover { background: #e5e5e5; }
 
-  /* === PRE-ROLL AD OVERLAY === */
-  .preroll-overlay {
+  /* === SOSIAL BAR CONTAINER === */
+  .socialbar-container {
+    width: 100%;
+    min-height: 60px;
+    margin: 12px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+  .socialbar-container.on-player { margin: 0 0 12px 0; }
+
+  /* === BANNER 300x250 === */
+  .banner-ad-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 18px auto;
+    max-width: 300px;
+    min-height: 250px;
+    background: #fafafa;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .banner-ad-wrap iframe { width: 300px; height: 250px; border: 0; display: block; background: transparent; }
+
+  /* === PRE-ROLL GATE 5 DETIK === */
+  .preroll-gate {
     position: absolute;
     inset: 0;
     background: #000;
@@ -73,31 +99,42 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    z-index: 5;
+    z-index: 10;
     color: #fff;
     text-align: center;
     padding: 20px;
+    overflow-y: auto;
   }
-  .preroll-overlay .preroll-title {
-    font-size: 0.85rem;
+  .preroll-gate .gate-label {
+    font-size: 0.75rem;
     color: #aaa;
-    margin-bottom: 16px;
+    margin-bottom: 8px;
     letter-spacing: 1px;
     text-transform: uppercase;
   }
-  .preroll-overlay .preroll-countdown {
-    font-size: 3rem;
+  .preroll-gate .gate-ad-slot {
+    width: 100%;
+    max-width: 360px;
+    min-height: 80px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+  .preroll-gate .gate-countdown {
+    font-size: 2.4rem;
     font-weight: 700;
     color: #ff4757;
-    margin-bottom: 12px;
+    margin-bottom: 6px;
     font-variant-numeric: tabular-nums;
   }
-  .preroll-overlay .preroll-text {
-    font-size: 0.9rem;
+  .preroll-gate .gate-text {
+    font-size: 0.85rem;
     color: #ddd;
-    margin-bottom: 20px;
+    margin-bottom: 14px;
   }
-  .preroll-overlay .preroll-skip {
+  .preroll-gate .gate-btn {
     display: none;
     padding: 12px 28px;
     background: #ff4757;
@@ -108,17 +145,17 @@
     font-weight: 600;
     cursor: pointer;
   }
-  .preroll-overlay .preroll-skip:hover { background: #e03e4e; }
-  .preroll-overlay .preroll-skip.show { display: inline-block; }
-  .preroll-overlay .preroll-progress {
+  .preroll-gate .gate-btn:hover { background: #e03e4e; }
+  .preroll-gate .gate-btn.show { display: inline-block; }
+  .preroll-gate .gate-progress {
     width: 200px;
     height: 4px;
     background: #333;
     border-radius: 2px;
     overflow: hidden;
-    margin-top: 16px;
+    margin-top: 12px;
   }
-  .preroll-overlay .preroll-progress-bar {
+  .preroll-gate .gate-progress-bar {
     height: 100%;
     background: #ff4757;
     width: 0%;
@@ -142,12 +179,25 @@
 <div class="main-container">
   <div id="viewList">
     <h2 style="font-size: 1.1rem; margin-bottom: 16px; color: #111;">Pilih Video</h2>
+
+    <!-- SOSIAL BAR #1 — di halaman list, atas grid -->
+    <div class="socialbar-container" id="socialbarList">
+      <script data-cfasync="false" src="https://biomanos.org/14/684edfbc0abd12a80ccb934dbdd668c1"></script>
+    </div>
+
     <div class="video-grid-container" id="videoGrid">
       <div style="grid-column: 1 / -1; text-align: center; color: #888; padding: 20px;">Memuat daftar video...</div>
     </div>
   </div>
+
   <div id="viewPlayer" class="hidden">
     <button class="btn-back" onclick="goBackToList()">← Kembali ke Daftar Video</button>
+
+    <!-- SOSIAL BAR #2 — di halaman player, atas video wrapper -->
+    <div class="socialbar-container on-player" id="socialbarPlayer">
+      <!-- akan diisi ulang via JS saat masuk player -->
+    </div>
+
     <div class="video-wrapper" id="playerWrapper">
       <div class="placeholder">Memuat video...</div>
     </div>
@@ -161,6 +211,16 @@
       <button class="like-btn" id="likeBtn" onclick="toggleLike()">👍 <span id="likeCount">0</span> Like</button>
       <button onclick="openShare()">🔗 Share</button>
     </div>
+
+    <!-- BANNER 300x250 — di halaman player -->
+    <div class="banner-ad-wrap">
+      <iframe id="bannerAdFrame"
+              sandbox="allow-scripts allow-same-origin"
+              scrolling="no"
+              style="width:300px;height:250px;border:0;display:block;background:transparent;">
+      </iframe>
+    </div>
+
     <div class="share-row" id="shareRow" style="display:none;">
       <input type="text" id="shareUrl" readonly>
       <button onclick="copyShare()">Salin Link</button>
@@ -199,144 +259,132 @@
   ];
 
   // ==========================================
-  // POPUNDER benchform.org (kurang agresif)
-  // - Maks 1x per hari per browser
-  // - Delay 8 detik setelah interaksi
-  // - Trigger di halaman list (klik video) & player
-  // - Tidak trigger dari tombol Like/Share/Back
-  // - Hormati Save-Data / reduced-motion
+  // IKLAN: Sosial Bar + Banner biomanos.org
   // ==========================================
-  const POPUNDER_SRC = 'https://benchform.org/1/9e72240f75b407d58c240d814380fcc7';
-  const POPUNDER_KEY = 'popunder_shown_date';
-  const POPUNDER_DELAY_MS = 8000;
+  const SOCIALBAR_SRC = 'https://biomanos.org/14/684edfbc0abd12a80ccb934dbdd668c1';
+  const BANNER_SRC = 'https://biomanos.org/22/2bc85909669de26b545e3502cadf231e';
+  const BANNER_KEY = 'banner_loaded_date';
 
-  let popunderScheduled = false;
-  let popunderTimer = null;
-
-  function isPopunderAllowed() {
-    const today = new Date().toDateString();
-    try {
-      if (localStorage.getItem(POPUNDER_KEY) === today) return false;
-    } catch (e) {
-      if (sessionStorage.getItem(POPUNDER_KEY) === '1') return false;
-    }
-    if (navigator.connection && navigator.connection.saveData) return false;
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
-    return true;
-  }
-
-  function markPopunderShown() {
-    const today = new Date().toDateString();
-    try {
-      localStorage.setItem(POPUNDER_KEY, today);
-    } catch (e) {
-      sessionStorage.setItem(POPUNDER_KEY, '1');
-    }
-  }
-
-  function loadPopunderNow() {
-    document.querySelectorAll('script[data-popunder="1"]').forEach(s => s.remove());
+  // Muat sosial bar ke container tertentu (dipanggil ulang saat masuk player)
+  function loadSocialBar(containerId) {
+    const c = document.getElementById(containerId);
+    if (!c) return;
+    // Bersihkan dulu
+    c.innerHTML = '';
     const s = document.createElement('script');
-    s.src = POPUNDER_SRC;
+    s.src = SOCIALBAR_SRC;
     s.async = true;
     s.setAttribute('data-cfasync', 'false');
-    s.setAttribute('data-popunder', '1');
-    document.head.appendChild(s);
-    markPopunderShown();
+    s.setAttribute('data-socialbar', '1');
+    c.appendChild(s);
   }
 
-  function schedulePopunder() {
-    if (popunderScheduled) return;
-    if (!isPopunderAllowed()) return;
-    popunderScheduled = true;
-    if (popunderTimer) clearTimeout(popunderTimer);
-    popunderTimer = setTimeout(() => {
-      if (!isPopunderAllowed()) return;
-      loadPopunderNow();
-    }, POPUNDER_DELAY_MS);
-  }
-
-  function cancelPopunderIfPending() {
-    if (popunderTimer) {
-      clearTimeout(popunderTimer);
-      popunderTimer = null;
+  // Muat banner 300x250 ke iframe terisolasi (1x per hari)
+  function loadBannerOnce() {
+    const today = new Date().toDateString();
+    try {
+      if (localStorage.getItem(BANNER_KEY) === today) return;
+      localStorage.setItem(BANNER_KEY, today);
+    } catch (e) {
+      if (sessionStorage.getItem(BANNER_KEY) === '1') return;
+      sessionStorage.setItem(BANNER_KEY, '1');
     }
-    popunderScheduled = false;
+
+    const frame = document.getElementById('bannerAdFrame');
+    if (!frame) return;
+    try {
+      const doc = frame.contentDocument || frame.contentWindow.document;
+      doc.open();
+      doc.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
+        <style>html,body{margin:0;padding:0;background:transparent;overflow:hidden;}</style>
+        <script>atOptions={'key':'2bc85909669de26b545e3502cadf231e','format':'iframe','height':250,'width':300,'params':{}};<\/script>
+        </head><body>
+        <script data-cfasync="false" src="${BANNER_SRC}"><\/script>
+        </body></html>`);
+      doc.close();
+    } catch (e) {
+      console.warn('Banner iframe error:', e);
+    }
   }
 
-  // Klik di mana saja (kecuali tombol aksi) => jadwalkan popunder
-  document.addEventListener('click', (e) => {
-    const t = e.target;
-    if (!t || !t.closest) return;
-    if (t.closest('.action-row') || t.closest('.share-row') || t.closest('.btn-back') || t.closest('.modal') || t.closest('.preroll-overlay')) return;
-    schedulePopunder();
-  });
-
-  document.addEventListener('touchstart', (e) => {
-    const t = e.target;
-    if (!t || !t.closest) return;
-    if (t.closest('.action-row') || t.closest('.share-row') || t.closest('.btn-back') || t.closest('.modal') || t.closest('.preroll-overlay')) return;
-    schedulePopunder();
-  }, { passive: true });
-
   // ==========================================
-  // PRE-ROLL AD 4 DETIK SEBELUM VIDEO PLAY
+  // PRE-ROLL GATE 5 DETIK
+  // - User harus klik area iklan ATAU tunggu 5 detik
+  // - Baru tombol "Lanjut ke Video" aktif
   // ==========================================
-  const PREROLL_SECONDS = 4;
+  const GATE_SECONDS = 5;
 
-  function showPrerollAd(onDone) {
+  function showPrerollGate(onDone) {
     const wrapper = document.getElementById('playerWrapper');
-    let remaining = PREROLL_SECONDS;
+    let remaining = GATE_SECONDS;
+    let userInteracted = false;
 
     wrapper.innerHTML = `
-      <div class="preroll-overlay" id="prerollOverlay">
-        <div class="preroll-title">Iklan Sebentar</div>
-        <div class="preroll-countdown" id="prerollCountdown">${remaining}</div>
-        <div class="preroll-text">Video akan tersedia dalam <span id="prerollSecText">${remaining}</span> detik</div>
-        <button class="preroll-skip" id="prerollSkipBtn">▶ Lanjut ke Video</button>
-        <div class="preroll-progress"><div class="preroll-progress-bar" id="prerollBar"></div></div>
+      <div class="preroll-gate" id="prerollGate">
+        <div class="gate-label">Iklan</div>
+        <div class="gate-ad-slot" id="gateAdSlot">
+          <!-- Sosial bar dimuat di sini -->
+        </div>
+        <div class="gate-countdown" id="gateCountdown">${remaining}</div>
+        <div class="gate-text">Klik iklan atau tunggu <span id="gateSecText">${remaining}</span> detik untuk lanjut</div>
+        <button class="gate-btn" id="gateBtn">▶ Lanjut ke Video</button>
+        <div class="gate-progress"><div class="gate-progress-bar" id="gateBar"></div></div>
       </div>
     `;
 
-    const countdownEl = document.getElementById('prerollCountdown');
-    const secTextEl = document.getElementById('prerollSecText');
-    const skipBtn = document.getElementById('prerollSkipBtn');
-    const bar = document.getElementById('prerollBar');
+    // Muat sosial bar ke dalam gate
+    const slot = document.getElementById('gateAdSlot');
+    const sb = document.createElement('script');
+    sb.src = SOCIALBAR_SRC;
+    sb.async = true;
+    sb.setAttribute('data-cfasync', 'false');
+    sb.setAttribute('data-socialbar', '1');
+    slot.appendChild(sb);
 
-    // progres bar dari 0% -> 100%
+    const countdownEl = document.getElementById('gateCountdown');
+    const secTextEl = document.getElementById('gateSecText');
+    const btn = document.getElementById('gateBtn');
+    const bar = document.getElementById('gateBar');
+
     setTimeout(() => { bar.style.width = '100%'; }, 50);
 
-    let interval = setInterval(() => {
+    // Deteksi klik di area iklan -> anggap user sudah interaksi
+    slot.addEventListener('click', () => {
+      userInteracted = true;
+    }, true);
+
+    const finish = () => {
+      clearInterval(interval);
+      const gate = document.getElementById('prerollGate');
+      if (gate) gate.remove();
+      window._cancelPrerollGate = null;
+      onDone();
+    };
+
+    const interval = setInterval(() => {
       remaining--;
       if (remaining < 0) remaining = 0;
       countdownEl.textContent = remaining;
       secTextEl.textContent = remaining;
+
       if (remaining <= 0) {
         clearInterval(interval);
         countdownEl.textContent = '✓';
         countdownEl.style.color = '#4caf50';
-        secTextEl.parentElement.textContent = 'Iklan selesai. Silakan lanjut menonton.';
-        skipBtn.classList.add('show');
-        skipBtn.focus();
+        document.querySelector('#prerollGate .gate-text').textContent = 'Silakan lanjut menonton.';
+        btn.classList.add('show');
+        btn.focus();
       }
     }, 1000);
 
-    // Tombol lanjut -> hentikan interval & panggil callback
-    const finish = () => {
-      clearInterval(interval);
-      const overlay = document.getElementById('prerollOverlay');
-      if (overlay) overlay.remove();
-      onDone();
-    };
+    btn.addEventListener('click', finish, { once: true });
 
-    skipBtn.addEventListener('click', finish, { once: true });
-
-    // Kalau user back sebelum selesai -> batalkan semuanya
-    window._cancelPreroll = () => {
+    // Kalau user back sebelum selesai
+    window._cancelPrerollGate = () => {
       clearInterval(interval);
-      const overlay = document.getElementById('prerollOverlay');
-      if (overlay) overlay.remove();
-      window._cancelPreroll = null;
+      const gate = document.getElementById('prerollGate');
+      if (gate) gate.remove();
+      window._cancelPrerollGate = null;
     };
   }
 
@@ -458,16 +506,19 @@
     document.getElementById('viewList').classList.add('hidden');
     document.getElementById('viewPlayer').classList.remove('hidden');
     window.scrollTo(0, 0);
+    // Muat ulang sosial bar di halaman player
+    loadSocialBar('socialbarPlayer');
   }
 
   window.goBackToList = function() {
-    if (window._cancelPreroll) { window._cancelPreroll(); }
-    cancelPopunderIfPending();
+    if (window._cancelPrerollGate) { window._cancelPrerollGate(); }
     if (unsubVideo) { unsubVideo(); unsubVideo = null; }
     document.getElementById('viewPlayer').classList.add('hidden');
     document.getElementById('viewList').classList.remove('hidden');
     history.pushState(null, '', location.pathname);
     document.getElementById('playerWrapper').innerHTML = '<div class="placeholder">Memuat video...</div>';
+    // Muat ulang sosial bar di list (kadang script perlu re-init)
+    loadSocialBar('socialbarList');
   };
 
   function startWatch(v) {
@@ -490,9 +541,8 @@
       document.getElementById('likeBtn').classList.toggle('liked', likedList.includes(v.id));
     });
 
-    // === PRE-ROLL 4 DETIK: tampilkan overlay dulu, baru play video ===
-    showPrerollAd(() => {
-      // User klik "Lanjut ke Video" setelah 4 detik
+    // Gate 5 detik -> baru play
+    showPrerollGate(() => {
       playVideoNow(v);
     });
   }
@@ -517,6 +567,9 @@
     } else {
       wrapper.innerHTML = `<iframe src="${escapeHtml(src)}" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; encrypted-media"></iframe>`;
     }
+
+    // Muat banner setelah video mulai (lazy)
+    setTimeout(loadBannerOnce, 2000);
 
     const seen = JSON.parse(sessionStorage.getItem('viewed_videos') || '[]');
     if (!seen.includes(v.id)) {
@@ -580,7 +633,12 @@
     return String(str || '').replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
   }
 
+  // Load awal
   loadVideos();
+  // Pastikan sosial bar di list ter-init setelah load
+  window.addEventListener('load', () => {
+    loadSocialBar('socialbarList');
+  });
 </script>
 </body>
 </html>
