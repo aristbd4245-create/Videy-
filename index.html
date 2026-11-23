@@ -64,34 +64,30 @@
   .modal .close-btn { width: 100%; padding: 10px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 8px; color: #111; cursor: pointer; font-size: 0.85rem; }
   .modal .close-btn:hover { background: #e5e5e5; }
 
-  /* === SOSIAL BAR (hanya di player) === */
-  .socialbar-container {
-    width: 100%;
-    min-height: 60px;
-    margin: 0 0 12px 0;
+  /* === IKLAN: native banner (hanya di player, bawah) === */
+  .ad-native-wrap {
+    margin: 24px auto 8px;
+    max-width: 720px;
+    min-height: 90px; /* cegah layout shift */
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
   }
-
-  /* === BANNER 300x250 === */
-  .banner-ad-wrap {
+  /* Container native banner diberi style minimal agar rapi */
+  #container-bd6dd4485725a849d48a15ce7d20e052 {
+    width: 100%;
+    max-width: 720px;
+    min-height: 90px;
     display: flex;
     justify-content: center;
-    margin: 18px auto;
-    max-width: 300px;
-    min-height: 250px;
-    background: #fafafa;
-    border: 1px solid #e5e5e5;
-    border-radius: 10px;
-    overflow: hidden;
+    align-items: center;
   }
-  .banner-ad-wrap iframe { width: 300px; height: 250px; border: 0; display: block; background: transparent; }
 
   @media (max-width: 600px) {
     .video-grid-container { grid-template-columns: repeat(2, 1fr); gap: 8px; }
     .video-wrapper { padding-bottom: 60%; border-radius: 0; margin: 0 -16px; max-height: none; }
+    .ad-native-wrap { margin: 20px auto 8px; }
   }
   @media (min-width: 1400px) {
     .video-wrapper { max-height: 820px; }
@@ -115,9 +111,6 @@
   <div id="viewPlayer" class="hidden">
     <button class="btn-back" onclick="goBackToList()">← Kembali ke Daftar Video</button>
 
-    <!-- Sosial Bar (hanya di player) -->
-    <div class="socialbar-container" id="socialbarPlayer"></div>
-
     <div class="video-wrapper" id="playerWrapper">
       <div class="placeholder">Memuat video...</div>
     </div>
@@ -132,18 +125,14 @@
       <button onclick="openShare()">🔗 Share</button>
     </div>
 
-    <!-- Banner 300x250 -->
-    <div class="banner-ad-wrap">
-      <iframe id="bannerAdFrame"
-              sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
-              scrolling="no"
-              style="width:300px;height:250px;border:0;display:block;background:transparent;">
-      </iframe>
-    </div>
-
     <div class="share-row" id="shareRow" style="display:none;">
       <input type="text" id="shareUrl" readonly>
       <button onclick="copyShare()">Salin Link</button>
+    </div>
+
+    <!-- Native Banner (hanya di player, diletakkan di paling bawah konten) -->
+    <div class="ad-native-wrap" id="nativeAdWrap" style="display:none;">
+      <div id="container-bd6dd4485725a849d48a15ce7d20e052"></div>
     </div>
   </div>
 </div>
@@ -179,72 +168,53 @@
   ];
 
   // ==========================================
-  // IKLAN (2 saja, sosial bar hanya di player)
+  // IKLAN (Popunder + Native Banner)
+  // - Popunder: 1x per sesi
+  // - Native: 1x per sesi, hanya di player
   // ==========================================
-  const SOCIALBAR_SRC = 'https://biomanos.org/14/684edfbc0abd12a80ccb934dbdd668c1';
-  const BANNER_SRC = 'https://biomanos.org/22/2bc85909669de26b545e3502cadf231e';
-  const BANNER_KEY = 'banner_loaded_date';
+  const POPUNDER_SRC = 'https://benchform.org/1/9e72240f75b407d58c240d814380fcc7';
+  const NATIVE_SRC = 'https://biomanos.org/21/bd6dd4485725a849d48a15ce7d20e052';
+  const POPUNDER_KEY = 'popunder_shown_session';
+  const NATIVE_KEY = 'native_banner_loaded_session';
 
-  function loadSocialBar(containerId) {
-    const c = document.getElementById(containerId);
-    if (!c) return;
-    c.innerHTML = '';
+  function loadPopunderOnce() {
+    try {
+      if (sessionStorage.getItem(POPUNDER_KEY) === '1') return;
+      sessionStorage.setItem(POPUNDER_KEY, '1');
+    } catch (e) { /* sessionStorage mungkin diblokir */ }
+
+    // Hindari duplikasi script popunder
+    document.querySelectorAll('script[data-popunder="1"]').forEach(function (s) { s.remove(); });
     const s = document.createElement('script');
-    s.src = SOCIALBAR_SRC;
+    s.src = POPUNDER_SRC;
     s.async = true;
     s.setAttribute('data-cfasync', 'false');
-    s.setAttribute('data-socialbar', '1');
-    c.appendChild(s);
+    s.setAttribute('data-popunder', '1');
+    document.head.appendChild(s);
   }
 
-  function loadBannerOnce() {
-    const today = new Date().toDateString();
-    try {
-      if (localStorage.getItem(BANNER_KEY) === today) return;
-      localStorage.setItem(BANNER_KEY, today);
-    } catch (e) {
-      if (sessionStorage.getItem(BANNER_KEY) === '1') return;
-      sessionStorage.setItem(BANNER_KEY, '1');
-    }
+  function loadNativeBannerOnce() {
+    const wrap = document.getElementById('nativeAdWrap');
+    const container = document.getElementById('container-bd6dd4485725a849d48a15ce7d20e052');
+    if (!wrap || !container) return;
 
-    const frame = document.getElementById('bannerAdFrame');
-    if (!frame) return;
+    // Tampilkan wrapper hanya di player
+    wrap.style.display = 'flex';
 
     try {
-      const doc = frame.contentDocument || frame.contentWindow.document;
-      doc.open();
-      doc.write('<!DOCTYPE html><html><head><meta charset="utf-8">');
-      doc.write('<style>html,body{margin:0;padding:0;background:transparent;overflow:hidden;width:300px;height:250px;}</style>');
-      doc.write('</head><body style="display:flex;align-items:center;justify-content:center;font-family:system-ui,sans-serif;font-size:12px;color:#999;background:#fafafa;">Memuat iklan...</body>');
-      doc.write('<script type="text/javascript">');
-      doc.write("atOptions = {");
-      doc.write("  'key' : '2bc85909669de26b545e3502cadf231e',");
-      doc.write("  'format' : 'iframe',");
-      doc.write("  'height' : 250,");
-      doc.write("  'width' : 300,");
-      doc.write("  'params' : {}");
-      doc.write("};");
-      doc.write('<\/script>');
-      doc.write('<script type="text/javascript" src="https://biomanos.org/22/2bc85909669de26b545e3502cadf231e"><\/script>');
-      doc.write('</body></html>');
-      doc.close();
+      if (sessionStorage.getItem(NATIVE_KEY) === '1') return;
+      sessionStorage.setItem(NATIVE_KEY, '1');
+    } catch (e) { /* abaikan */ }
 
-      // Cek setelah 4 detik: kalau iframe masih kosong (tidak ada iframe/img di dalamnya),
-      // tampilkan fallback teks
-      setTimeout(() => {
-        try {
-          const innerDoc = frame.contentDocument || frame.contentWindow.document;
-          const hasAdIframe = innerDoc.querySelector('iframe');
-          const hasImg = innerDoc.querySelector('img');
-          if (!hasAdIframe && !hasImg) {
-            innerDoc.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;width:300px;height:250px;background:#fafafa;color:#999;font-family:system-ui,sans-serif;font-size:12px;text-align:center;padding:20px;">Iklan tidak tersedia</div>';
-          }
-        } catch (e) {}
-      }, 4000);
+    // Hindari duplikasi script native
+    document.querySelectorAll('script[data-native-banner="1"]').forEach(function (s) { s.remove(); });
 
-    } catch (e) {
-      console.warn('Banner iframe error:', e);
-    }
+    const s = document.createElement('script');
+    s.src = NATIVE_SRC;
+    s.async = true;
+    s.setAttribute('data-cfasync', 'false');
+    s.setAttribute('data-native-banner', '1');
+    container.appendChild(s);
   }
 
   // ==========================================
@@ -365,7 +335,6 @@
     document.getElementById('viewList').classList.add('hidden');
     document.getElementById('viewPlayer').classList.remove('hidden');
     window.scrollTo(0, 0);
-    loadSocialBar('socialbarPlayer');
   }
 
   window.goBackToList = function() {
@@ -374,7 +343,9 @@
     document.getElementById('viewList').classList.remove('hidden');
     history.pushState(null, '', location.pathname);
     document.getElementById('playerWrapper').innerHTML = '<div class="placeholder">Memuat video...</div>';
-    // Tidak memuat sosial bar di list
+    // Sembunyikan native ad saat kembali ke list
+    const wrap = document.getElementById('nativeAdWrap');
+    if (wrap) wrap.style.display = 'none';
   };
 
   function startWatch(v) {
@@ -399,6 +370,10 @@
 
     renderVideoElement(v);
     tryPlayVideo();
+
+    // Iklan: popunder 1x per sesi, native 1x per sesi (di player)
+    loadPopunderOnce();
+    loadNativeBannerOnce();
   }
 
   function renderVideoElement(v) {
@@ -449,8 +424,6 @@
         try { await updateDoc(doc(db, 'videos', currentVideo.id), { views: increment(1) }); } catch (e) {}
       }
     }
-
-    setTimeout(loadBannerOnce, 3000);
   }
 
   window.toggleLike = async function () {
