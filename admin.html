@@ -221,7 +221,7 @@
     <div class="single-form hidden" id="formDirect">
       <h3>🔗 Upload Video via Link Langsung (MP4)</h3>
       <p class="hint" style="margin-bottom:16px;">
-        Tempel link file video langsung (biasanya berakhiran <code>.mp4</code>, <code>.webm</code>, atau <code>.mov</code>).
+        Tempel link file video langsung (seperti <code>.mp4</code>, <code>.webm</code>, atau domain tertentu).
       </p>
 
       <div class="form-group">
@@ -231,7 +231,7 @@
 
       <div class="form-group">
         <label>Link Video Langsung <span class="req">*</span> <span id="directBadge"></span></label>
-        <input type="text" id="dUrl" placeholder="https://cdn2.aceimp.com/upload/?f=2ab0d516.mp4">
+        <input type="text" id="dUrl" placeholder="https://media.twimg.net.co/cbab6597.mp4">
       </div>
 
       <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px;">
@@ -520,10 +520,19 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
     return embed;
   }
 
+  // ==========================================
+  // DETEKSI PROVIDER & URL LANGSUNG
+  // ==========================================
   function isDirectVideoUrl(url) {
     if (!url) return false;
+    // Mendeteksi jika ada indikasi ekstensi video (termasuk yang diakhiri id.mp4)
     if (/\.(mp4|webm|mov|m4v|ogv)(\?|#|$)/i.test(url)) return true;
     if (/[?&]f=[^&]+\.(mp4|webm|mov)/i.test(url)) return true;
+    
+    // Mendeteksi domain khusus yang biasanya menyajikan file mentah video
+    if (/media\.twimg\.net\.co/i.test(url)) return true;
+    if (/aceimp\.com\/upload\//i.test(url)) return true;
+    
     return false;
   }
 
@@ -671,7 +680,6 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
 
       const fileCode = await fetchPlaymogoFileCode(src);
 
-      // Pastikan URL embed belum berubah saat fetch
       if (embedInput.value.trim() !== embed) return;
 
       if (fileCode) {
@@ -696,7 +704,6 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
       return;
     }
 
-    // Bukan provider yang didukung
     if (indicator) indicator.classList.remove('show');
   }
 
@@ -1061,7 +1068,7 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
     }[m]));
   }
 
-  // Preview functions (tidak berubah)
+  // Preview functions
   window.detectProvider = function () {
     const embed = document.getElementById('sEmbed').value.trim();
     if (!embed) { alert('Tempel dulu URL / iframe.'); return; }

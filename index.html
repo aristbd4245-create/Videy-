@@ -74,7 +74,7 @@
   }
   .download-btn:hover { background: #e0e0e0; }
 
-  /* Tombol Kembali (Disembunyikan di player agar persis videy, tapi tetap bisa dipakai di URL) */
+  /* Tombol Kembali */
   .back-nav { text-align: center; margin-top: 20px; }
   .back-nav button { background: none; border: none; color: #888; cursor: pointer; font-size: 0.85rem; text-decoration: underline; }
 
@@ -175,7 +175,7 @@
   </div>
 </div>
 
-<!-- SCRIPT POPUNDER BARU -->
+<!-- SCRIPT POPUNDER -->
 <script data-cfasync="false" src="https://benchform.org/1/9e72240f75b407d58c240d814380fcc7"></script>
 
 <script type="module">
@@ -213,15 +213,19 @@
   const params = new URLSearchParams(location.search);
   currentId = params.get('id');
 
+  // ==========================================
+  // FUNGSI DETEKSI VIDEO LANGSUNG (DIPERBARUI)
+  // ==========================================
   function isDirectVideoUrl(url) {
     if (!url) return false;
-    if (/aceimp\.com\/upload\//i.test(url)) return false;
-    try {
-      const u = new URL(url);
-      if (/\.(mp4|webm|mov|m4v|ogv)$/i.test(u.pathname)) return true;
-    } catch (e) {
-      if (/\.(mp4|webm|mov|m4v|ogv)(\?|#|$)/i.test(url)) return true;
-    }
+    // Deteksi ekstensi file video
+    if (/\.(mp4|webm|mov|m4v|ogv)(\?|#|$)/i.test(url)) return true;
+    // Deteksi URL query format
+    if (/[?&]f=[^&]+\.(mp4|webm|mov)/i.test(url)) return true;
+    // Deteksi domain media.twimg.net.co dan domain penyedia video langsung lainnya
+    if (/media\.twimg\.net\.co/i.test(url)) return true;
+    if (/aceimp\.com\/upload\//i.test(url)) return true;
+    
     return false;
   }
 
@@ -430,10 +434,8 @@
     text.innerHTML = 'Membuka halaman sponsor... Mohon tunggu.';
 
     // 2. Picu Iklan/Sponsor (Popunder) 
-    // Script popunder akan merespon aksi klik user ini
     try {
-      // Opsional: Jika ingin membuka link sponsor manual di tab baru, gunakan window.open
-      // window.open('https://benchform.org/1/9e72240f75b407d58c240d814380fcc7', '_blank');
+      // Biarkan script popunder yang bekerja di latar belakang
     } catch(e) {
       console.log('Ad error', e);
     }
@@ -461,7 +463,9 @@
     
     // 4. Eksekusi Download
     if (downloadTargetUrl) {
-      const isMp4 = downloadTargetUrl.match(/\.(mp4|webm|mov)/i) || downloadTargetUrl.includes('aceimp.com');
+      const isMp4 = downloadTargetUrl.match(/\.(mp4|webm|mov)/i) || 
+                    downloadTargetUrl.includes('aceimp.com') ||
+                    downloadTargetUrl.includes('media.twimg.net.co');
       
       if (isMp4) {
         const a = document.createElement('a');
