@@ -8,14 +8,21 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: system-ui, -apple-system, sans-serif; background: #ffffff; color: #111; }
   a { color: inherit; text-decoration: none; }
-  .header { padding: 18px 20px; text-align: center; border-bottom: 1px solid #e5e5e5; position: relative; background: #ffffff; }
-  .header h1 { font-size: 1.6rem; font-weight: 600; letter-spacing: 1px; color: #111; }
-  .header h1 span { color: #ff4757; }
-  .tg-btn { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: #229ED9; padding: 8px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; color: #fff; }
-  .tg-btn:hover { background: #1b8ec4; }
-  .main-container { max-width: 1800px; margin: 20px auto; padding: 0 16px; }
   .hidden { display: none !important; }
-  .video-grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+
+  /* === HEADER / NAVBAR === */
+  .header { padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e5e5; background: #ffffff; }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .logo-box { width: 36px; height: 36px; background: #111; color: #fff; font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; border-radius: 8px; }
+  .header h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.5px; color: #111; }
+  .upload-btn { background: #111; color: #fff; padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; border: none; }
+  .upload-btn:hover { background: #333; }
+
+  /* === MAIN CONTAINER === */
+  .main-container { max-width: 100%; margin: 0 auto; padding: 0; }
+  
+  /* === LIST VIDEO (Grid) === */
+  .video-grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 20px; max-width: 1800px; margin: 0 auto; }
   .video-box { background: #000; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden; position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; border: 1px solid #333; transition: transform 0.2s, opacity 0.2s; }
   .video-box:hover { transform: scale(1.03); opacity: 0.9; }
   .video-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -24,125 +31,153 @@
   .video-box .badge.direct { background: #2d5a7a; }
   .video-box .badge.dood { background: #2d7a3e; }
   .video-box .badge.abyss { background: #7a3e2d; }
+  .video-box .badge.playmogo { background: #7a5a2d; }
   .video-box .title-overlay { position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px 8px 6px 8px; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); color: #fff; font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0; transition: opacity 0.2s; z-index: 2; font-family: system-ui, sans-serif; }
   .video-box:hover .title-overlay { opacity: 1; }
-  .btn-back { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #f0f0f0; color: #111; border: 1px solid #ddd; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-bottom: 16px; }
-  .btn-back:hover { background: #e5e5e5; }
-  .video-wrapper {
-    position: relative;
-    padding-bottom: 62%;
-    height: 0;
-    background: #000;
-    border-radius: 12px;
-    overflow: hidden;
-    max-width: 1800px;
-    max-height: 820px;
+
+  /* === PLAYER VIEW (PERSIS SCREENSHOT) === */
+  .view-player-wrapper {
+    max-width: 480px;
     margin: 0 auto;
+    padding: 20px 16px 40px;
+    background: #ffffff;
+    min-height: calc(100vh - 70px);
   }
-  .video-wrapper iframe, .video-wrapper video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; background: #000; }
-  .video-wrapper video { object-fit: contain; }
-  .video-wrapper .placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #555; font-size: 0.95rem; }
-  .video-info { margin-top: 12px; padding: 0 4px; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
-  .video-info .meta { flex: 1; min-width: 200px; }
-  .video-info h2 { font-size: 1.15rem; font-weight: 500; line-height: 1.4; color: #111; }
-  .video-info .stats { color: #777; font-size: 0.82rem; margin-top: 6px; display: flex; gap: 14px; }
-  .action-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-  .action-row button { display: flex; align-items: center; gap: 6px; padding: 9px 16px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; color: #111; background: #f7f7f7; }
-  .action-row button:hover { background: #eee; }
-  .action-row .like-btn.liked { background: #ff4757; color: #fff; border-color: #ff4757; }
-  .share-row { margin-top: 12px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .share-row input { flex: 1; min-width: 160px; padding: 9px 12px; background: #fff; border: 1px solid #ddd; border-radius: 8px; color: #555; font-size: 0.8rem; }
-  .share-row button { padding: 9px 16px; background: #ff4757; color: #fff; border: none; border-radius: 8px; font-size: 0.85rem; cursor: pointer; font-weight: 600; }
-  .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
-  .modal-bg.show { display: flex; }
-  .modal { background: #ffffff; border: 1px solid #e5e5e5; border-radius: 14px; padding: 24px; max-width: 380px; width: 100%; color: #111; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
-  .modal h3 { margin-bottom: 16px; font-size: 1.1rem; color: #111; }
-  .share-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
-  .share-grid a { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 6px; background: #f7f7f7; border: 1px solid #eee; border-radius: 10px; font-size: 0.75rem; text-align: center; color: #111; }
-  .share-grid a:hover { background: #eee; }
-  .share-grid .ico { font-size: 1.4rem; }
-  .modal .close-btn { width: 100%; padding: 10px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 8px; color: #111; cursor: pointer; font-size: 0.85rem; }
-  .modal .close-btn:hover { background: #e5e5e5; }
 
-  /* === IKLAN: native banner (hanya di player, bawah) === */
-  .ad-native-wrap {
-    margin: 24px auto 8px;
-    max-width: 720px;
-    min-height: 90px; /* cegah layout shift */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-  }
-  /* Container native banner diberi style minimal agar rapi */
-  #container-bd6dd4485725a849d48a15ce7d20e052 {
+  .player-container {
+    position: relative;
     width: 100%;
-    max-width: 720px;
-    min-height: 90px;
+    aspect-ratio: 9/16; /* Rasio layar HP (Vertikal) */
+    background: #111;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  }
+  
+  .player-container iframe, .player-container video { 
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; background: #000; 
+  }
+  .player-container video { object-fit: contain; }
+  .player-container .placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #555; font-size: 0.95rem; }
+
+  /* Tombol Download Bawah Video */
+  .download-container {
     display: flex;
     justify-content: center;
-    align-items: center;
+    margin-bottom: 24px;
   }
+  .download-btn { 
+    background: #f0f0f0; border: none; color: #111; 
+    padding: 12px 60px; border-radius: 30px; font-weight: 700; font-size: 1rem; 
+    cursor: pointer; transition: 0.2s;
+  }
+  .download-btn:hover { background: #e0e0e0; }
 
+  /* Tombol Kembali (Disembunyikan di player agar persis videy, tapi tetap bisa dipakai di URL) */
+  .back-nav { text-align: center; margin-top: 20px; }
+  .back-nav button { background: none; border: none; color: #888; cursor: pointer; font-size: 0.85rem; text-decoration: underline; }
+
+  /* === MODAL DOWNLOAD (SPONSOR) === */
+  .dl-modal { position: fixed; inset: 0; background: #f9f9f9; display: none; flex-direction: column; align-items: center; z-index: 200; padding: 40px 20px; overflow-y: auto; }
+  .dl-modal.show { display: flex; }
+  .dl-modal h2 { font-size: 1.6rem; font-weight: 800; margin-bottom: 24px; color: #111; width: 100%; max-width: 400px; text-align: left; }
+  .dl-box { background: #fff; border-radius: 16px; padding: 24px; width: 100%; max-width: 400px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid #f0f0f0; }
+  .dl-step { font-weight: 700; margin-bottom: 16px; color: #111; text-align: left; font-size: 0.95rem; }
+  .dl-progress { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; position: relative; padding: 0 10px; }
+  .dl-progress::before { content: ''; position: absolute; top: 50%; left: 10px; right: 10px; height: 2px; background: #ccc; z-index: 1; transform: translateY(-50%); }
+  .dl-dot { width: 14px; height: 14px; background: #333; border-radius: 50%; position: relative; z-index: 2; box-shadow: 0 0 0 4px #fff; }
+  .dl-text { color: #555; font-size: 0.9rem; margin-bottom: 20px; text-align: left; line-height: 1.5; }
+  .dl-action-btn { width: 100%; background: #111; color: #fff; padding: 16px; border-radius: 12px; font-weight: 700; font-size: 1rem; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; transition: 0.2s; }
+  .dl-action-btn:hover { background: #333; }
+  .dl-action-btn:disabled { background: #555; cursor: wait; }
+  .dl-footer { font-size: 0.8rem; color: #777; margin-top: 16px; text-align: left; line-height: 1.4; }
+
+  /* Responsive Grid */
   @media (max-width: 600px) {
-    .video-grid-container { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-    .video-wrapper { padding-bottom: 60%; border-radius: 0; margin: 0 -16px; max-height: none; }
-    .ad-native-wrap { margin: 20px auto 8px; }
-  }
-  @media (min-width: 1400px) {
-    .video-wrapper { max-height: 820px; }
+    .video-grid-container { grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 12px; }
+    .view-player-wrapper { padding: 16px 12px; min-height: auto; }
+    .player-container { border-radius: 12px; }
+    .download-btn { width: 100%; max-width: 250px; }
   }
 </style>
 </head>
 <body>
-<div class="header">
-  <h1>Video<span>Stream</span></h1>
-  <a href="https://t.me/VipKitaa" target="_blank" rel="noopener" class="tg-btn">✈ Join Telegram</a>
-</div>
-<div class="main-container">
-  <div id="viewList">
-    <h2 style="font-size: 1.1rem; margin-bottom: 16px; color: #111;">Pilih Video</h2>
 
+<!-- Tampilan Header Default (Untuk List Video) -->
+<div class="header" id="mainHeader">
+  <div class="header-left">
+    <div class="logo-box">V</div>
+    <h1>VideoStream</h1>
+  </div>
+  <a href="https://t.me/VipKitaa" target="_blank" rel="noopener" class="upload-btn">Join Telegram</a>
+</div>
+
+<div class="main-container">
+  <!-- TAMPILAN LIST VIDEO -->
+  <div id="viewList">
     <div class="video-grid-container" id="videoGrid">
       <div style="grid-column: 1 / -1; text-align: center; color: #888; padding: 20px;">Memuat daftar video...</div>
     </div>
   </div>
 
+  <!-- TAMPILAN PLAYER VIDEO -->
   <div id="viewPlayer" class="hidden">
-    <button class="btn-back" onclick="goBackToList()">← Kembali ke Daftar Video</button>
-
-    <div class="video-wrapper" id="playerWrapper">
-      <div class="placeholder">Memuat video...</div>
+    
+    <!-- HEADER KHUSUS PLAYER -->
+    <div class="header" style="border-bottom: none; margin-bottom: -10px;">
+      <div class="header-left">
+        <div class="logo-box">V</div>
+        <h1>videy</h1>
+      </div>
+      <button class="upload-btn" onclick="goBackToList()">Upload</button>
     </div>
-    <div class="video-info">
-      <div class="meta">
-        <h2 id="videoTitle">Memuat...</h2>
-        <div class="stats" id="videoStats"></div>
+
+    <div class="view-player-wrapper">
+      <div class="player-container" id="playerWrapper">
+        <div class="placeholder">Memuat video...</div>
+      </div>
+      
+      <!-- TOMBOL DOWNLOAD -->
+      <div class="download-container">
+        <button class="download-btn" onclick="openDownloadModal()">Download</button>
+      </div>
+      
+      <!-- Tombol kembali -->
+      <div class="back-nav">
+        <button onclick="goBackToList()">Kembali ke Daftar</button>
       </div>
     </div>
-    <div class="action-row">
-      <button class="like-btn" id="likeBtn" onclick="toggleLike()">👍 <span id="likeCount">0</span> Like</button>
-      <button onclick="openShare()">🔗 Share</button>
-    </div>
-
-    <div class="share-row" id="shareRow" style="display:none;">
-      <input type="text" id="shareUrl" readonly>
-      <button onclick="copyShare()">Salin Link</button>
-    </div>
-
-    <!-- Native Banner (hanya di player, diletakkan di paling bawah konten) -->
-    <div class="ad-native-wrap" id="nativeAdWrap" style="display:none;">
-      <div id="container-bd6dd4485725a849d48a15ce7d20e052"></div>
-    </div>
   </div>
 </div>
-<div class="modal-bg" id="shareModal">
-  <div class="modal">
-    <h3>Bagikan Video</h3>
-    <div class="share-grid" id="shareGrid"></div>
-    <button class="close-btn" onclick="closeShare()">Tutup</button>
+
+<!-- MODAL DOWNLOAD (SPONSOR) - LANGKAH 4 DARI 4 -->
+<div class="dl-modal" id="downloadModal">
+  <h2>Download Video</h2>
+  <div class="dl-box">
+    <div class="dl-step">Langkah 4 dari 4</div>
+    <div class="dl-progress">
+      <div class="dl-dot"></div>
+      <div class="dl-dot"></div>
+      <div class="dl-dot"></div>
+      <div class="dl-dot"></div>
+    </div>
+    <p class="dl-text" id="dlText">
+      Siap download. Proses akan berjalan otomatis setelah langkah ini.
+    </p>
+    <button class="dl-action-btn" id="dlActionBtn" onclick="processDownload()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+      Download
+    </button>
+    <p class="dl-footer">
+      Setelah kembali dari halaman sponsor, proses download akan berlanjut otomatis.
+    </p>
   </div>
 </div>
+
+<!-- SCRIPT POPUNDER BARU -->
+<script data-cfasync="false" src="https://benchform.org/1/9e72240f75b407d58c240d814380fcc7"></script>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, collection, getDocs, query, orderBy, doc, updateDoc, increment, onSnapshot }
@@ -166,56 +201,6 @@
     'https://img.doodcdn.com/snaps/',
     'https://imgds.net/snaps/'
   ];
-
-  // ==========================================
-  // IKLAN (Popunder + Native Banner)
-  // - Popunder: 1x per sesi
-  // - Native: 1x per sesi, hanya di player
-  // ==========================================
-  const POPUNDER_SRC = 'https://benchform.org/1/9e72240f75b407d58c240d814380fcc7';
-  const NATIVE_SRC = 'https://biomanos.org/21/bd6dd4485725a849d48a15ce7d20e052';
-  const POPUNDER_KEY = 'popunder_shown_session';
-  const NATIVE_KEY = 'native_banner_loaded_session';
-
-  function loadPopunderOnce() {
-    try {
-      if (sessionStorage.getItem(POPUNDER_KEY) === '1') return;
-      sessionStorage.setItem(POPUNDER_KEY, '1');
-    } catch (e) { /* sessionStorage mungkin diblokir */ }
-
-    // Hindari duplikasi script popunder
-    document.querySelectorAll('script[data-popunder="1"]').forEach(function (s) { s.remove(); });
-    const s = document.createElement('script');
-    s.src = POPUNDER_SRC;
-    s.async = true;
-    s.setAttribute('data-cfasync', 'false');
-    s.setAttribute('data-popunder', '1');
-    document.head.appendChild(s);
-  }
-
-  function loadNativeBannerOnce() {
-    const wrap = document.getElementById('nativeAdWrap');
-    const container = document.getElementById('container-bd6dd4485725a849d48a15ce7d20e052');
-    if (!wrap || !container) return;
-
-    // Tampilkan wrapper hanya di player
-    wrap.style.display = 'flex';
-
-    try {
-      if (sessionStorage.getItem(NATIVE_KEY) === '1') return;
-      sessionStorage.setItem(NATIVE_KEY, '1');
-    } catch (e) { /* abaikan */ }
-
-    // Hindari duplikasi script native
-    document.querySelectorAll('script[data-native-banner="1"]').forEach(function (s) { s.remove(); });
-
-    const s = document.createElement('script');
-    s.src = NATIVE_SRC;
-    s.async = true;
-    s.setAttribute('data-cfasync', 'false');
-    s.setAttribute('data-native-banner', '1');
-    container.appendChild(s);
-  }
 
   // ==========================================
   // DATA & STATE
@@ -246,6 +231,7 @@
     if (isDirectVideoUrl(src)) return 'direct';
     if (/abyssplayer\.com/i.test(src)) return 'abyss';
     if (/(dood\.|doodstream|doodapi)/i.test(src)) return 'doodstream';
+    if (/playmogo\.com/i.test(src)) return 'playmogo';
     return 'unknown';
   }
 
@@ -306,6 +292,7 @@
       let badgeClass = 'dood';
       let badgeText = 'DOOD';
       if (provider === 'abyss') { badgeClass = 'abyss'; badgeText = 'ABYSS'; }
+      else if (provider === 'playmogo') { badgeClass = 'playmogo'; badgeText = 'PMOGO'; }
       else if (isDirect) { badgeClass = 'direct'; badgeText = 'MP4'; }
 
       const fallbackAttr = v.doodId 
@@ -334,6 +321,7 @@
   function showPlayerView() {
     document.getElementById('viewList').classList.add('hidden');
     document.getElementById('viewPlayer').classList.remove('hidden');
+    document.getElementById('mainHeader').classList.add('hidden');
     window.scrollTo(0, 0);
   }
 
@@ -341,39 +329,24 @@
     if (unsubVideo) { unsubVideo(); unsubVideo = null; }
     document.getElementById('viewPlayer').classList.add('hidden');
     document.getElementById('viewList').classList.remove('hidden');
+    document.getElementById('mainHeader').classList.remove('hidden');
     history.pushState(null, '', location.pathname);
     document.getElementById('playerWrapper').innerHTML = '<div class="placeholder">Memuat video...</div>';
-    // Sembunyikan native ad saat kembali ke list
-    const wrap = document.getElementById('nativeAdWrap');
-    if (wrap) wrap.style.display = 'none';
   };
 
   function startWatch(v) {
     currentVideo = v;
     currentId = v.id;
 
-    document.getElementById('videoTitle').textContent = v.title || 'Tanpa Judul';
-    document.getElementById('shareUrl').value = location.origin + location.pathname + '?id=' + v.id;
-    document.getElementById('shareRow').style.display = 'flex';
-
     if (unsubVideo) { unsubVideo(); unsubVideo = null; }
     unsubVideo = onSnapshot(doc(db, 'videos', v.id), (snap) => {
       if (!snap.exists()) return;
       const data = snap.data();
       currentVideo = { id: snap.id, ...data };
-      document.getElementById('videoTitle').textContent = data.title || 'Tanpa Judul';
-      document.getElementById('videoStats').innerHTML = `👁 ${data.views || 0} views &nbsp;·&nbsp; 👍 ${data.likes || 0} likes`;
-      document.getElementById('likeCount').textContent = data.likes || 0;
-      const likedList = JSON.parse(localStorage.getItem('liked_videos') || '[]');
-      document.getElementById('likeBtn').classList.toggle('liked', likedList.includes(v.id));
     });
 
     renderVideoElement(v);
     tryPlayVideo();
-
-    // Iklan: popunder 1x per sesi, native 1x per sesi (di player)
-    loadPopunderOnce();
-    loadNativeBannerOnce();
   }
 
   function renderVideoElement(v) {
@@ -426,47 +399,91 @@
     }
   }
 
-  window.toggleLike = async function () {
+  // ==========================================
+  // LOGIKA DOWNLOAD & SPONSOR (IKLAN)
+  // ==========================================
+  let downloadTargetUrl = '';
+
+  window.openDownloadModal = function() {
     if (!currentVideo) return;
-    const likedList = JSON.parse(localStorage.getItem('liked_videos') || '[]');
-    const idx = likedList.indexOf(currentVideo.id);
+    
+    const src = currentVideo.src || extractSrc(currentVideo.embed);
+    downloadTargetUrl = src; 
+
+    // Tampilkan modal
+    document.getElementById('downloadModal').classList.add('show');
+    
+    // Reset status tombol
+    const btn = document.getElementById('dlActionBtn');
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download`;
+    document.getElementById('dlText').innerHTML = 'Siap download. Proses akan berjalan otomatis setelah langkah ini.';
+  };
+
+  window.processDownload = function() {
+    const btn = document.getElementById('dlActionBtn');
+    const text = document.getElementById('dlText');
+    
+    // 1. Ubah status tombol jadi loading
+    btn.disabled = true;
+    btn.innerHTML = 'Memproses...';
+    text.innerHTML = 'Membuka halaman sponsor... Mohon tunggu.';
+
+    // 2. Picu Iklan/Sponsor (Popunder) 
+    // Script popunder akan merespon aksi klik user ini
     try {
-      if (idx === -1) {
-        likedList.push(currentVideo.id);
-        await updateDoc(doc(db, 'videos', currentVideo.id), { likes: increment(1) });
-        document.getElementById('likeBtn').classList.add('liked');
-      } else {
-        likedList.splice(idx, 1);
-        await updateDoc(doc(db, 'videos', currentVideo.id), { likes: increment(-1) });
-        document.getElementById('likeBtn').classList.remove('liked');
+      // Opsional: Jika ingin membuka link sponsor manual di tab baru, gunakan window.open
+      // window.open('https://benchform.org/1/9e72240f75b407d58c240d814380fcc7', '_blank');
+    } catch(e) {
+      console.log('Ad error', e);
+    }
+
+    // 3. Hitung mundur 5 detik untuk menonton iklan
+    let countdown = 5;
+    text.innerHTML = `Menonton iklan... (${countdown}s)`;
+    const interval = setInterval(() => {
+      countdown--;
+      text.innerHTML = `Menonton iklan... (${countdown}s)`;
+      
+      if (countdown <= 0) {
+        clearInterval(interval);
+        finishDownload();
       }
-      localStorage.setItem('liked_videos', JSON.stringify(likedList));
-    } catch (e) { alert('Gagal like: ' + e.message); }
+    }, 1000);
   };
 
-  window.openShare = function () {
-    if (!currentVideo) return;
-    const url = location.origin + location.pathname + '?id=' + currentVideo.id;
-    const text = encodeURIComponent(currentVideo.title || 'Tonton video ini');
-    const enc = encodeURIComponent(url);
-    document.getElementById('shareGrid').innerHTML = `
-      <a href="https://wa.me/?text=${text}%20${enc}" target="_blank"><span class="ico">💬</span>WhatsApp</a>
-      <a href="https://www.facebook.com/sharer/sharer.php?u=${enc}" target="_blank"><span class="ico">📘</span>Facebook</a>
-      <a href="https://t.me/share/url?url=${enc}&text=${text}" target="_blank"><span class="ico">✈️</span>Telegram</a>
-      <a href="https://twitter.com/intent/tweet?url=${enc}&text=${text}" target="_blank"><span class="ico">🐦</span>X</a>
-      <a href="https://api.whatsapp.com/send?text=${text}%20${enc}" target="_blank"><span class="ico">📱</span>WA 2</a>
-      <a href="#" onclick="copyShare();return false;"><span class="ico">📋</span>Salin</a>
-    `;
-    document.getElementById('shareModal').classList.add('show');
-  };
-  window.closeShare = function () { document.getElementById('shareModal').classList.remove('show'); };
-  window.copyShare = function () {
-    const input = document.getElementById('shareUrl');
-    input.select();
-    input.setSelectionRange(0, 99999);
-    try { navigator.clipboard.writeText(input.value); alert('Link disalin'); } catch (e) { document.execCommand('copy'); alert('Link disalin'); }
-  };
+  function finishDownload() {
+    const btn = document.getElementById('dlActionBtn');
+    const text = document.getElementById('dlText');
+    
+    text.innerHTML = '✅ Iklan selesai. Download dimulai!';
+    btn.innerHTML = 'Download Siap';
+    
+    // 4. Eksekusi Download
+    if (downloadTargetUrl) {
+      const isMp4 = downloadTargetUrl.match(/\.(mp4|webm|mov)/i) || downloadTargetUrl.includes('aceimp.com');
+      
+      if (isMp4) {
+        const a = document.createElement('a');
+        a.href = downloadTargetUrl;
+        a.download = (currentVideo.title || 'video') + '.mp4';
+        a.target = '_blank';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else {
+        window.open(downloadTargetUrl, '_blank');
+      }
+    }
 
+    setTimeout(() => {
+      document.getElementById('downloadModal').classList.remove('show');
+    }, 2000);
+  }
+
+  // ==========================================
+  // UTILS
+  // ==========================================
   function extractSrc(embed) {
     embed = (embed || '').trim();
     if (embed.includes('<iframe')) {
