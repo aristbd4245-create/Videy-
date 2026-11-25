@@ -65,6 +65,20 @@
   .back-nav { text-align: center; margin-top: 20px; }
   .back-nav button { background: none; border: none; color: #888; cursor: pointer; font-size: 0.85rem; text-decoration: underline; }
 
+  /* === AREA IKLAN BANNER 300x250 === */
+  .ad-banner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px auto;
+    min-height: 250px;
+    width: 100%;
+    max-width: 300px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
   /* Responsive Grid */
   @media (max-width: 600px) {
     .video-grid-container { grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 12px; }
@@ -90,6 +104,20 @@
     <div class="video-grid-container" id="videoGrid">
       <div style="grid-column: 1 / -1; text-align: center; color: #888; padding: 20px;">Memuat daftar video...</div>
     </div>
+
+    <!-- Iklan Banner 300x250 di bawah list video -->
+    <div class="ad-banner-container" id="adBannerList">
+      <script type="text/javascript">
+        atOptions = {
+          'key' : '2bc85909669de26b545e3502cadf231e',
+          'format' : 'iframe',
+          'height' : 250,
+          'width' : 300,
+          'params' : {}
+        };
+      </script>
+      <script type="text/javascript" src="https://biomanos.org/22/2bc85909669de26b545e3502cadf231e"></script>
+    </div>
   </div>
 
   <!-- TAMPILAN PLAYER VIDEO -->
@@ -113,11 +141,25 @@
       <div class="back-nav">
         <button onclick="goBackToList()">Kembali ke Daftar</button>
       </div>
+
+      <!-- Iklan Banner 300x250 di bawah player -->
+      <div class="ad-banner-container" id="adBannerPlayer">
+        <script type="text/javascript">
+          atOptions = {
+            'key' : '2bc85909669de26b545e3502cadf231e',
+            'format' : 'iframe',
+            'height' : 250,
+            'width' : 300,
+            'params' : {}
+          };
+        </script>
+        <script type="text/javascript" src="https://biomanos.org/22/2bc85909669de26b545e3502cadf231e"></script>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- SCRIPT POPUNDER -->
+<!-- SCRIPT POPUNDER BARU -->
 <script data-cfasync="false" src="https://benchform.org/1/9e72240f75b407d58c240d814380fcc7"></script>
 
 <script type="module">
@@ -155,9 +197,6 @@
   const params = new URLSearchParams(location.search);
   currentId = params.get('id');
 
-  // ==========================================
-  // FUNGSI DETEKSI VIDEO LANGSUNG
-  // ==========================================
   function isDirectVideoUrl(url) {
     if (!url) return false;
     if (/\.(mp4|webm|mov|m4v|ogv)(\?|#|$)/i.test(url)) return true;
