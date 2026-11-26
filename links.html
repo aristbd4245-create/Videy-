@@ -43,7 +43,7 @@
   }
   .copy-page-btn:hover { background: #333; }
 
-  /* === DAFTAR LINK (SEJAJAR RAPI, TETAP BERBENTUK LINK) === */
+  /* === DAFTAR LINK === */
   .link-list {
     display: flex;
     flex-direction: column;
@@ -61,6 +61,25 @@
     padding: 4px 0;
   }
   .link-item:hover { color: #0d47a1; }
+
+  /* === INFO BATCH === */
+  .batch-info {
+    font-size: 0.8rem;
+    color: #888;
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    background: #f0f8ff;
+    border: 1px solid #dce9f5;
+    border-radius: 6px;
+    display: inline-block;
+  }
+  .batch-info code {
+    background: #fff;
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: #d63384;
+    font-size: 0.78rem;
+  }
 
   /* === RESPONSIVE === */
   @media (max-width: 600px) {
@@ -84,14 +103,17 @@
      Salin Link Halaman Ini
   </button>
 
+  <!-- Info batch -->
+  <div class="batch-info" id="batchInfo" style="display:none;"></div>
+
   <!-- Tempat daftar link akan dimunculkan -->
   <div class="link-list" id="linkList">
-    <p style="color:#888;">Memuat 25 video terbaru...</p>
+    <p style="color:#888;">Memuat video terbaru...</p>
   </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, getDocs, query, orderBy, limit }
+  import { getFirestore, collection, getDocs, query, orderBy, where, limit }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -107,23 +129,83 @@
   const db = getFirestore(app);
   const videosRef = collection(db, "videos");
 
+  const params = new URLSearchParams(location.search);
+  const batchParam = params.get('batch');
+
   async function loadLinks() {
     const container = document.getElementById('linkList');
+    const infoEl = document.getElementById('batchInfo');
 
     try {
-      // Ambil HANYA 25 data terbaru dari Firebase
-      const q = query(videosRef, orderBy('createdAt', 'desc'), limit(25));
-      const snap = await getDocs(q);
+      let docs = [];
 
-      if (snap.empty) {
-        container.innerHTML = '<p style="color:#888;">Belum ada video di database.</p>';
+      if (batchParam) {
+        // Mode batch: tampilkan HANYA video dengan batchId tertentu
+        const targetBatch = Number(batchParam);
+        // Query berdasarkan batchId (exact match)
+        const q1 = query(videosRef, where('batchId', '==', targetBatch), orderBy('createdAt', 'asc'));
+        const snap1 = await getDocs(q1);
+        docs = snap1.docs;
+
+        // Jika batchId tidak ketemu (video lama tanpa batchId), coba fallback:
+        // cari video dengan createdAt dalam rentang 5 menit dari targetBatch
+        if (docs.length === 0) {
+          const q2 = query(videosRef, orderBy('createdAt', 'desc'));
+          const snap2 = await getDocs(q2);
+          docs = snap2.docs.filter(d => {
+            const data = d.data();
+            const t = data.batchId || data.createdAt;
+            return Math.abs(t - targetBatch) <= 5 * 60 * 1000;
+          });
+        }
+
+        if (infoEl) {
+          infoEl.style.display = 'inline-block';
+          infoEl.innerHTML = ` Menampilkan <strong>${docs.length} video</strong> dari batch upload terbaru <code>${escapeHtml(batchParam)}</code>`;
+        }
+      } else {
+        // Mode default: tampilkan video dari batch TERBARU saja
+        const q = query(videosRef, orderBy('createdAt', 'desc'));
+        const snap = await getDocs(q);
+        const allVideos = snap.docs;
+
+        if (allVideos.length === 0) {
+          container.innerHTML = '<p style="color:#888;">Belum ada video di database.</p>';
+          return;
+        }
+
+        // Tentukan batch terbaru = createdAt video paling baru
+        const newest = allVideos[0].data();
+        const newestBatch = newest.batchId || newest.createdAt;
+
+        // Ambil semua video yang batchId-nya sama (atau createdAt dalam 5 menit)
+        docs = allVideos.filter(d => {
+          const data = d.data();
+          const t = data.batchId || data.createdAt;
+          return Math.abs(t - newestBatch) <= 5 * 60 * 1000;
+        });
+
+        if (infoEl) {
+          infoEl.style.display = 'inline-block';
+          infoEl.innerHTML = ` Menampilkan <strong>${docs.length} video</strong> dari upload terbaru`;
+        }
+      }
+
+      if (docs.length === 0) {
+        container.innerHTML = '<p style="color:#888;">Tidak ada video untuk batch ini.</p>';
         return;
       }
 
       const baseUrl = location.origin + location.pathname.replace(/links\.html?$/i, '');
 
-      // Setiap baris: link (a) saja — tanpa nomor, sejajar rapi
-      const linksHtml = snap.docs.map((docSnap) => {
+      // Urutkan ascending (video yang diupload duluan di atas)
+      docs.sort((a, b) => {
+        const ta = a.data().createdAt || 0;
+        const tb = b.data().createdAt || 0;
+        return ta - tb;
+      });
+
+      const linksHtml = docs.map((docSnap) => {
         const url = baseUrl + '?id=' + docSnap.id;
         return `<a href="${url}" target="_blank" rel="noopener" class="link-item">${url}</a>`;
       }).join('');
@@ -135,14 +217,13 @@
     }
   }
 
-  // Fungsi untuk menyalin URL halaman ini
+  // Fungsi untuk menyalin URL halaman ini (dengan batch param jika ada)
   window.copyPageUrl = function() {
     const pageUrl = window.location.href;
 
     navigator.clipboard.writeText(pageUrl).then(() => {
       alert('Berhasil menyalin link halaman ini!');
     }).catch(err => {
-      // Fallback jika browser memblokir clipboard API
       const ta = document.createElement('textarea');
       ta.value = pageUrl;
       document.body.appendChild(ta);
@@ -153,7 +234,12 @@
     });
   };
 
-  // Jalankan fungsi saat halaman dibuka
+  function escapeHtml(str) {
+    return String(str || '').replace(/[&<>"]/g, m => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'
+    }[m]));
+  }
+
   loadLinks();
 </script>
 </body>
