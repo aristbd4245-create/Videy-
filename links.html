@@ -7,23 +7,26 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: system-ui, -apple-system, sans-serif; background: #ffffff; color: #111; padding: 20px; }
-  
-  h1 { font-size: 2rem; font-weight: 800; margin-bottom: 20px; color: #000; }
-  
-  .link-list { display: flex; flex-direction: column; gap: 8px; }
-  
-  .link-item {
-    display: block;
-    color: #1a73e8; /* Warna biru link */
-    font-size: 1.1rem;
-    text-decoration: underline;
-    word-break: break-all;
-    line-height: 1.5;
-  }
-  
-  .link-item:hover { color: #0d47a1; }
 
-  /* Tombol Salin Halaman */
+  /* === HEADER / LOGO videy === */
+  .header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .logo-box {
+    width: 40px; height: 40px;
+    background: #111; color: #fff;
+    font-weight: bold; font-size: 1.3rem;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+  .header h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: #111;
+    margin: 0;
+  }
+
+  /* === TOMBOL SALIN HALAMAN === */
   .copy-page-btn {
     margin-bottom: 20px;
     padding: 10px 20px;
@@ -39,15 +42,46 @@
     gap: 8px;
   }
   .copy-page-btn:hover { background: #333; }
+
+  /* === DAFTAR LINK (SEJAJAR RAPI, TETAP BERBENTUK LINK) === */
+  .link-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 900px;
+  }
+
+  .link-item {
+    display: block;
+    color: #1a73e8;
+    font-size: 1rem;
+    text-decoration: underline;
+    word-break: break-all;
+    line-height: 1.5;
+    padding: 4px 0;
+  }
+  .link-item:hover { color: #0d47a1; }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 600px) {
+    body { padding: 14px; }
+    .header h1 { font-size: 1.5rem; }
+    .logo-box { width: 34px; height: 34px; font-size: 1.1rem; }
+    .link-item { font-size: 0.85rem; }
+  }
 </style>
 </head>
 <body>
 
-  <h1>videy</h1>
-  
+  <!-- HEADER LOGO videy -->
+  <div class="header">
+    <div class="logo-box">V</div>
+    <h1>videy</h1>
+  </div>
+
   <!-- Tombol untuk menyalin link halaman ini -->
   <button class="copy-page-btn" onclick="copyPageUrl()">
-    ðŸ“‹ Salin Link Halaman Ini
+     Salin Link Halaman Ini
   </button>
 
   <!-- Tempat daftar link akan dimunculkan -->
@@ -75,23 +109,23 @@
 
   async function loadLinks() {
     const container = document.getElementById('linkList');
-    
+
     try {
       // Ambil HANYA 25 data terbaru dari Firebase
       const q = query(videosRef, orderBy('createdAt', 'desc'), limit(25));
       const snap = await getDocs(q);
-      
+
       if (snap.empty) {
         container.innerHTML = '<p style="color:#888;">Belum ada video di database.</p>';
         return;
       }
 
       const baseUrl = location.origin + location.pathname.replace(/links\.html?$/i, '');
-      
-      // Buat list link berdasarkan ID video
-      const linksHtml = snap.docs.map(doc => {
-        const url = baseUrl + '?id=' + doc.id;
-        return `<a href="${url}" target="_blank" class="link-item">${url}</a>`;
+
+      // Setiap baris: link (a) saja — tanpa nomor, sejajar rapi
+      const linksHtml = snap.docs.map((docSnap) => {
+        const url = baseUrl + '?id=' + docSnap.id;
+        return `<a href="${url}" target="_blank" rel="noopener" class="link-item">${url}</a>`;
       }).join('');
 
       container.innerHTML = linksHtml;
@@ -104,7 +138,7 @@
   // Fungsi untuk menyalin URL halaman ini
   window.copyPageUrl = function() {
     const pageUrl = window.location.href;
-    
+
     navigator.clipboard.writeText(pageUrl).then(() => {
       alert('Berhasil menyalin link halaman ini!');
     }).catch(err => {

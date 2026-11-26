@@ -85,6 +85,104 @@
   .copy-all-videos-btn.copied { background: #4caf50; }
   .copy-all-videos-btn.copied:hover { background: #43a047; }
 
+  /* === Panel Preview Link Terbaru (sama seperti links.html) === */
+  .links-preview-panel {
+    background: #f0f8ff;
+    border: 1px solid #b3d9f0;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 24px;
+  }
+  .links-preview-panel h3 {
+    font-size: 1rem;
+    margin-bottom: 6px;
+    color: #2d5a7a;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .links-preview-panel h3 code {
+    background: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: #d63384;
+  }
+  .links-preview-panel .sub-hint {
+    font-size: 0.78rem;
+    color: #888;
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+  .links-preview-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    align-items: center;
+  }
+  .links-preview-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 360px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #dce9f5;
+    border-radius: 8px;
+    padding: 8px;
+  }
+  .links-preview-list .lp-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    background: #fafcff;
+    border: 1px solid #eaf2fa;
+    border-radius: 6px;
+    font-size: 0.82rem;
+  }
+  .links-preview-list .lp-row .lp-num {
+    color: #888;
+    font-weight: bold;
+    min-width: 24px;
+    font-size: 0.78rem;
+  }
+  .links-preview-list .lp-row a {
+    color: #1a73e8;
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    word-break: break-all;
+  }
+  .links-preview-list .lp-row a:hover { text-decoration: underline; }
+  .links-preview-list .lp-row .lp-title {
+    color: #555;
+    font-size: 0.72rem;
+    max-width: 130px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .links-preview-list .lp-row .lp-copy {
+    background: #f0f0f0;
+    color: #111;
+    border: 1px solid #ddd;
+    padding: 4px 10px;
+    font-size: 0.72rem;
+    border-radius: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .links-preview-list .lp-row .lp-copy:hover { background: #e5e5e5; }
+  .links-preview-list .lp-row .lp-copy.copied { background: #4caf50; color: #fff; border-color: #4caf50; }
+  .links-preview-empty { color: #aaa; font-size: 0.85rem; padding: 12px; text-align: center; }
+
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 24px; }
   .stat-card { background: #fafafa; border: 1px solid #eee; border-radius: 10px; padding: 16px; }
   .stat-card .label { color: #888; font-size: 0.8rem; margin-bottom: 6px; }
@@ -140,6 +238,7 @@
     .row-2 { grid-template-columns: 1fr; }
     .video-item { flex-direction: column; align-items: stretch; }
     .video-item .actions { justify-content: flex-end; }
+    .links-preview-list .lp-row .lp-title { display: none; }
   }
 </style>
 </head>
@@ -173,12 +272,25 @@
       <a href="links.html" target="_blank">
         📋 Halaman 25 Link Video
       </a>
-      <button class="copy-links-page-btn" id="copyLinksPageBtn" onclick="copyLinksPageUrl()">
-        📋 Salin Link Halaman Links
-      </button>
-      <button class="copy-all-videos-btn" id="copyAllVideosBtn" onclick="copyAllVideoLinks()">
-        🔗 Salin Semua Link Video
-      </button>
+    </div>
+
+    <!-- === PANEL PREVIEW LINK TERBARU (SAMA SEPERTI links.html) === -->
+    <div class="links-preview-panel">
+      <h3>
+        🔗 Preview Link di Halaman <code>links.html</code> (25 Terbaru)
+      </h3>
+      <p class="sub-hint">
+        Daftar di bawah ini <strong>sama persis</strong> dengan yang tampil di halaman <a href="links.html" target="_blank" style="color:#1a73e8;">links.html</a>.
+        Setiap kali Anda upload video baru, daftar ini otomatis ter-update di posisi teratas.
+      </p>
+      <div class="links-preview-actions">
+        <button class="copy-links-page-btn" id="copyLinksPageBtn" onclick="copyLinksPageUrl()">📋 Salin Link Halaman Links</button>
+        <button class="copy-all-videos-btn" id="copyAllVideosBtn" onclick="copyAllVideoLinks()">🔗 Salin Semua Link di Atas</button>
+        <a href="links.html" target="_blank" style="align-self:center; font-size:0.82rem; color:#1a73e8;">Buka links.html →</a>
+      </div>
+      <div class="links-preview-list" id="linksPreviewList">
+        <div class="links-preview-empty">Memuat...</div>
+      </div>
     </div>
 
     <!-- SINKRONISASI DOODSTREAM -->
@@ -406,7 +518,6 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
   const videosRef = collection(db, "videos");
 
   let unsubList = null;
-  let latestVideosForCopy = [];   // <-- Untuk tombol "Salin Semua Link Video"
 
   const DOOD_THUMB_DOMAINS = [
     'https://img.doodcdn.co/snaps/',
@@ -419,12 +530,10 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
     'https://imgds.net/splash/'
   ];
 
-  // === Provider PlayMogo ===
   const PLAYMOGO_SNAP_BASE = 'https://imgds.net/snaps/';
   const PLAYMOGO_SPLASH_BASE = 'https://imgds.net/splash/';
   const PLAYMOGO_FILE_RE = /imgds\.net\/(?:snaps|splash)\/([a-z0-9]{6,})\.(?:jpg|jpeg|png)/i;
 
-  // Cache fetch PlayMogo
   const playmogoCache = {};
 
   // ==========================================
@@ -497,18 +606,20 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
   };
 
   // ==========================================
-  // SALIN SEMUA LINK VIDEO (25 terbaru, ?id=...)
+  // SALIN SEMUA LINK DARI PANEL PREVIEW (25 terbaru)
   // ==========================================
   window.copyAllVideoLinks = async function () {
     const btn = document.getElementById('copyAllVideosBtn');
-    if (!latestVideosForCopy || latestVideosForCopy.length === 0) {
-      alert('Belum ada video untuk disalin. Upload dulu atau tunggu data termuat.');
+    const listEl = document.getElementById('linksPreviewList');
+    if (!listEl) return;
+
+    const anchors = listEl.querySelectorAll('a');
+    if (anchors.length === 0) {
+      alert('Belum ada link di panel preview. Upload video dulu.');
       return;
     }
 
-    const base = location.origin + location.pathname.replace(/admin\.html?$/i, '');
-    const top25 = latestVideosForCopy.slice(0, 25);
-    const text = top25.map(v => base + '?id=' + v.id).join('\n');
+    const text = Array.from(anchors).map(a => a.href).join('\n');
 
     try {
       if (navigator.clipboard && window.isSecureContext) {
@@ -525,7 +636,7 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
       }
 
       const oldHtml = btn.innerHTML;
-      btn.innerHTML = '✅ ' + top25.length + ' Link Tersalin!';
+      btn.innerHTML = '✅ ' + anchors.length + ' Link Tersalin!';
       btn.classList.add('copied');
       setTimeout(() => {
         btn.innerHTML = oldHtml;
@@ -533,6 +644,60 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
       }, 2500);
     } catch (e) {
       prompt('Salin manual semua link berikut:', text);
+    }
+  };
+
+  // ==========================================
+  // RENDER PANEL PREVIEW LINK (SAMA PERSIS links.html)
+  // ==========================================
+  function renderLinksPreview(videos) {
+    const container = document.getElementById('linksPreviewList');
+    if (!container) return;
+
+    // links.html: orderBy('createdAt','desc') + limit(25)
+    // onSnapshot sudah orderBy('createdAt','desc'), jadi slice(0,25) = sama
+    const top25 = videos.slice(0, 25);
+
+    if (top25.length === 0) {
+      container.innerHTML = '<div class="links-preview-empty">Belum ada video di database.</div>';
+      return;
+    }
+
+    const base = location.origin + location.pathname.replace(/admin\.html?$/i, '');
+
+    container.innerHTML = top25.map((v, i) => {
+      const url = base + '?id=' + v.id;
+      return `<div class="lp-row">
+        <span class="lp-num">${i + 1}.</span>
+        <a href="${url}" target="_blank" rel="noopener">${url}</a>
+        <span class="lp-title" title="${escapeHtml(v.title || 'Tanpa Judul')}">${escapeHtml(v.title || 'Tanpa Judul')}</span>
+        <button class="lp-copy" onclick="copySinglePreviewLink('${v.id}', this)">Salin</button>
+      </div>`;
+    }).join('');
+  }
+
+  window.copySinglePreviewLink = async function (id, btn) {
+    const base = location.origin + location.pathname.replace(/admin\.html?$/i, '');
+    const url = base + '?id=' + id;
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      const old = btn.textContent;
+      btn.textContent = 'Tersalin';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = old; btn.classList.remove('copied'); }, 1500);
+    } catch (e) {
+      prompt('Salin manual link berikut:', url);
     }
   };
 
@@ -623,9 +788,9 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
     const q = query(videosRef, orderBy('createdAt', 'desc'));
     unsubList = onSnapshot(q, (snap) => {
       const videos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      latestVideosForCopy = videos;   // <-- Simpan untuk tombol salin semua link
       renderAdminLists(videos);
       renderStats(videos);
+      renderLinksPreview(videos);   // <-- Panel preview link (sama seperti links.html)
     }, (err) => {
       document.getElementById('adminListEmbed').innerHTML =
         '<p style="color:#ff4757;">Gagal memuat: ' + err.message + '</p>';
