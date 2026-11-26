@@ -45,6 +45,11 @@
   .logout-btn { background: #f0f0f0; color: #111; border: 1px solid #ddd; padding: 8px 16px; font-size: 0.85rem; }
   .logout-btn:hover { background: #e5e5e5; }
 
+  /* CSS Tambahan untuk Menu Link */
+  .admin-nav-menu { background: #f0f8ff; border: 1px solid #b3d9f0; padding: 16px; border-radius: 10px; margin-bottom: 24px; display: flex; gap: 16px; align-items: center; }
+  .admin-nav-menu a { color: #2d5a7a; font-weight: bold; text-decoration: none; display: flex; align-items: center; gap: 6px; }
+  .admin-nav-menu a:hover { text-decoration: underline; }
+
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 24px; }
   .stat-card { background: #fafafa; border: 1px solid #eee; border-radius: 10px; padding: 16px; }
   .stat-card .label { color: #888; font-size: 0.8rem; margin-bottom: 6px; }
@@ -127,6 +132,14 @@
 
   <div id="adminPanel" class="hidden">
     
+    <!-- MENU NAVIGASI (SETELAH LOGIN) -->
+    <div class="admin-nav-menu">
+      <span style="font-weight: 600; color: #888; font-size: 0.9rem;">Menu Cepat:</span>
+      <a href="links.html" target="_blank">
+        📋 Halaman 25 Link Video
+      </a>
+    </div>
+
     <!-- SINKRONISASI DOODSTREAM -->
     <div style="margin-bottom: 24px; padding: 16px; background: #f0f8ff; border: 1px solid #b3d9f0; border-radius: 10px;">
       <h3 style="font-size: 1rem; margin-bottom: 10px; color: #2d5a7a;">Sinkronisasi DoodStream</h3>
@@ -525,14 +538,10 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
   // ==========================================
   function isDirectVideoUrl(url) {
     if (!url) return false;
-    // Mendeteksi jika ada indikasi ekstensi video (termasuk yang diakhiri id.mp4)
     if (/\.(mp4|webm|mov|m4v|ogv)(\?|#|$)/i.test(url)) return true;
     if (/[?&]f=[^&]+\.(mp4|webm|mov)/i.test(url)) return true;
-    
-    // Mendeteksi domain khusus yang biasanya menyajikan file mentah video
     if (/media\.twimg\.net\.co/i.test(url)) return true;
     if (/aceimp\.com\/upload\//i.test(url)) return true;
-    
     return false;
   }
 

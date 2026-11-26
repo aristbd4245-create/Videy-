@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daftar Link Video - videy</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: #ffffff; color: #111; padding: 20px; }
+  
+  h1 { font-size: 2rem; font-weight: 800; margin-bottom: 20px; color: #000; }
+  
+  .link-list { display: flex; flex-direction: column; gap: 8px; }
+  
+  .link-item {
+    display: block;
+    color: #1a73e8; /* Warna biru link */
+    font-size: 1.1rem;
+    text-decoration: underline;
+    word-break: break-all;
+    line-height: 1.5;
+  }
+  
+  .link-item:hover { color: #0d47a1; }
+
+  /* Tombol Salin Halaman */
+  .copy-page-btn {
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    background: #111;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .copy-page-btn:hover { background: #333; }
+</style>
+</head>
+<body>
+
+  <h1>videy</h1>
+  
+  <!-- Tombol untuk menyalin link halaman ini -->
+  <button class="copy-page-btn" onclick="copyPageUrl()">
+    📋 Salin Link Halaman Ini
+  </button>
+
+  <!-- Tempat daftar link akan dimunculkan -->
+  <div class="link-list" id="linkList">
+    <p style="color:#888;">Memuat 25 video terbaru...</p>
+  </div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, query, orderBy, limit }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyATGNzE8e6McTLl9OnDV70aKfyXhDR_Jgo",
+    authDomain: "videy-clone-50c2b.firebaseapp.com",
+    projectId: "videy-clone-50c2b",
+    storageBucket: "videy-clone-50c2b.firebasestorage.app",
+    messagingSenderId: "663076090581",
+    appId: "1:663076090581:web:7c977193104a43b18ba85c"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const videosRef = collection(db, "videos");
+
+  async function loadLinks() {
+    const container = document.getElementById('linkList');
+    
+    try {
+      // Ambil HANYA 25 data terbaru dari Firebase
+      const q = query(videosRef, orderBy('createdAt', 'desc'), limit(25));
+      const snap = await getDocs(q);
+      
+      if (snap.empty) {
+        container.innerHTML = '<p style="color:#888;">Belum ada video di database.</p>';
+        return;
+      }
+
+      const baseUrl = location.origin + location.pathname.replace(/links\.html?$/i, '');
+      
+      // Buat list link berdasarkan ID video
+      const linksHtml = snap.docs.map(doc => {
+        const url = baseUrl + '?id=' + doc.id;
+        return `<a href="${url}" target="_blank" class="link-item">${url}</a>`;
+      }).join('');
+
+      container.innerHTML = linksHtml;
+
+    } catch (e) {
+      container.innerHTML = `<p style="color:#ff4757;">Gagal memuat data: ${e.message}</p>`;
+    }
+  }
+
+  // Fungsi untuk menyalin URL halaman ini
+  window.copyPageUrl = function() {
+    const pageUrl = window.location.href;
+    
+    navigator.clipboard.writeText(pageUrl).then(() => {
+      alert('Berhasil menyalin link halaman ini!');
+    }).catch(err => {
+      // Fallback jika browser memblokir clipboard API
+      const ta = document.createElement('textarea');
+      ta.value = pageUrl;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      alert('Berhasil menyalin link halaman ini!');
+    });
+  };
+
+  // Jalankan fungsi saat halaman dibuka
+  loadLinks();
+</script>
+</body>
+</html>
