@@ -20,7 +20,7 @@
 
   /* === MAIN CONTAINER === */
   .main-container { max-width: 100%; margin: 0 auto; padding: 0; }
-  
+
   /* === LIST VIDEO (Grid) === */
   .video-grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 20px; max-width: 1800px; margin: 0 auto; }
   .video-box { background: #000; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden; position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; border: 1px solid #333; transition: transform 0.2s, opacity 0.2s; }
@@ -54,9 +54,9 @@
     margin-bottom: 20px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.15);
   }
-  
-  .player-container iframe, .player-container video { 
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; background: #000; 
+
+  .player-container iframe, .player-container video {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; background: #000;
   }
   .player-container video { object-fit: contain; }
   .player-container .placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #555; font-size: 0.95rem; }
@@ -303,11 +303,7 @@
   }
 </style>
 
-<!-- ============================================== -->
-<!-- POPUNDER ADSTERRA (DIPINDAH KE SINI)           -->
-<!-- ============================================== -->
-<script data-cfasync="false" src="https://benchform.org/1/9e72240f75b407d58c240d814380fcc7"></script>
-
+<!-- Popunder dimuat via JS saat player dibuka (lihat script di bawah) -->
 </head>
 <body>
 
@@ -433,6 +429,28 @@
   ];
 
   // ==========================================
+  // POPUNDER — dimuat SEKALI per sesi player
+  // (anti-spam: guard via sessionStorage)
+  // ==========================================
+  const POPUNDER_SRC = 'https://benchform.org/1/9e72240f75b407d58c240d814380fcc7';
+  const POPUNDER_SESSION_KEY = 'popunder_loaded_session';
+
+  function loadPopunderOnce() {
+    try {
+      if (sessionStorage.getItem(POPUNDER_SESSION_KEY) === '1') return;
+      sessionStorage.setItem(POPUNDER_SESSION_KEY, '1');
+
+      const s = document.createElement('script');
+      s.setAttribute('data-cfasync', 'false');
+      s.src = POPUNDER_SRC;
+      s.async = true;
+      document.body.appendChild(s);
+    } catch (e) {
+      // silent
+    }
+  }
+
+  // ==========================================
   // ANTI ADBLOCK DETECTION
   // ==========================================
   let adblockDetected = false;
@@ -553,10 +571,10 @@
   const ADSTERRA_SCRIPT_URL = 'https://biomanos.org/22/2bc85909669de26b545e3502cadf231e';
   const ADGATE_DURATION = 4;        // detik iklan
   const ADGATE_COOLDOWN = 8;        // detik jeda sebelum bisa tonton iklan lagi
-  
-  // ⚠️ GANTI URL DI BAWAH INI DENGAN DIRECT LINK ADSTERRA ANDA ⚠️
-  const ADGATE_AD_URL = 'https://www.effectiveratecpm.com/'; 
-  
+
+  // ✅ Direct link tombol "Tonton Iklan" (baru)
+  const ADGATE_AD_URL = 'https://auctionr.org/4/6ae8f126de1b500bc55ac857d3622413';
+
   const ADGATE_LS_KEY = 'adgate_last_unlock_ts';
 
   let adgateTimer = null;
@@ -806,6 +824,7 @@
         const found = allVideos.find(v => v.id === currentId);
         if (found) {
           showPlayerView();
+          loadPopunderOnce();   // ← popunder hanya di halaman play
           startWatch(found);
         }
       }
@@ -828,15 +847,15 @@
       const displayThumb = proxyImage(thumbUrl);
       const provider = getProvider(v);
       const isDirect = provider === 'direct';
-      
+
       let badgeClass = 'dood';
       let badgeText = 'DOOD';
       if (provider === 'abyss') { badgeClass = 'abyss'; badgeText = 'ABYSS'; }
       else if (provider === 'playmogo') { badgeClass = 'playmogo'; badgeText = 'PMOGO'; }
       else if (isDirect) { badgeClass = 'direct'; badgeText = 'MP4'; }
 
-      const fallbackAttr = v.doodId 
-        ? `onerror="tryThumb(this, '${v.doodId}', 1)"` 
+      const fallbackAttr = v.doodId
+        ? `onerror="tryThumb(this, '${v.doodId}', 1)"`
         : `onerror="this.style.display='none'"`;
 
       return `
@@ -844,118 +863,86 @@
           <span class="badge ${badgeClass}">${badgeText}</span>
           ${displayThumb ? `<img src="${escapeHtml(displayThumb)}" alt="" ${fallbackAttr}>` : `<div style="width:100%; height:100%; background:#222;"></div>`}
           <div class="play-icon">▶</div>
-          <div class="title-overlay">${escapeHtml(v.title || 'Tanpa Judul')}</div>
+          <div class="title-overlay">${escapeHtml(v.title || '')}</div>
         </div>
       `;
     }).join('');
   }
 
-  window.openVideoPlayer = function(id) {
-    const video = allVideos.find(v => v.id === id);
-    if (!video) return;
-    adgateUnlocked = false;
-    showPlayerView();
-    startWatch(video);
-    history.pushState(null, '', '?id=' + id);
-  };
-
   function showPlayerView() {
     document.getElementById('viewList').classList.add('hidden');
     document.getElementById('viewPlayer').classList.remove('hidden');
-    document.getElementById('mainHeader').classList.add('hidden');
-    window.scrollTo(0, 0);
   }
 
-  window.goBackToList = function() {
-    if (unsubVideo) { unsubVideo(); unsubVideo = null; }
+  function goBackToList() {
     document.getElementById('viewPlayer').classList.add('hidden');
     document.getElementById('viewList').classList.remove('hidden');
-    document.getElementById('mainHeader').classList.remove('hidden');
-    history.pushState(null, '', location.pathname);
-    document.getElementById('playerWrapper').innerHTML = '<div class="placeholder">Memuat video...</div>';
-    hideAdblockOverlay();
-    
-    // Reset gate saat kembali ke list
-    const overlay = document.getElementById('adgateOverlay');
-    if (overlay) overlay.classList.add('hidden');
-    const wrapper = document.getElementById('playerWrapper');
-    if (wrapper) wrapper.classList.remove('player-locked');
+    history.replaceState(null, '', location.pathname);
+    currentId = null;
+    if (unsubVideo) { unsubVideo(); unsubVideo = null; }
+  }
+  window.goBackToList = goBackToList;
+
+  window.openVideoPlayer = function (id) {
+    loadPopunderOnce();   // ← guard sessionStorage mencegah spam
+    const found = allVideos.find(v => v.id === id);
+    if (!found) return;
+    history.pushState(null, '', '?id=' + id);
+    currentId = id;
+    showPlayerView();
+    startWatch(found);
   };
 
-  async function startWatch(v) {
-    currentVideo = v;
-    currentId = v.id;
+  function renderVideoElement(v) {
+    const wrapper = document.getElementById('playerWrapper');
+    if (!wrapper) return;
+    wrapper.innerHTML = '';
 
-    if (unsubVideo) { unsubVideo(); unsubVideo = null; }
-    unsubVideo = onSnapshot(doc(db, 'videos', v.id), (snap) => {
-      if (!snap.exists()) return;
-      const data = snap.data();
-      currentVideo = { id: snap.id, ...data };
-    });
+    const provider = getProvider(v);
+    const src = v.src || extractSrc(v.embed);
 
-    const adblockOk = await checkAdblockAndNotify();
-    if (!adblockOk) {
-      const wrapper = document.getElementById('playerWrapper');
-      if (wrapper) {
-        wrapper.innerHTML = '<div class="placeholder" style="color:#ff4757;text-align:center;padding:20px;flex-direction:column;gap:8px;"><span>🚫 DNS AdBlock Terdeteksi</span><span style="font-size:0.8rem;color:#888;">Matikan DNS AdBlock atau klik "Lewati Pemeriksaan"</span></div>';
-      }
+    if (provider === 'direct' || isDirectVideoUrl(src)) {
+      const video = document.createElement('video');
+      video.src = src;
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      wrapper.appendChild(video);
       return;
     }
 
+    const iframe = document.createElement('iframe');
+    iframe.src = src;
+    iframe.allowFullscreen = true;
+    iframe.setAttribute('allow', 'autoplay; encrypted-media; fullscreen; picture-in-picture');
+    iframe.setAttribute('referrerpolicy', 'no-referrer');
+    wrapper.appendChild(iframe);
+  }
+
+  function tryPlayVideo() {
+    const wrapper = document.getElementById('playerWrapper');
+    if (!wrapper) return;
+    const video = wrapper.querySelector('video');
+    if (video) {
+      const p = video.play();
+      if (p && typeof p.catch === 'function') p.catch(() => {});
+    }
+  }
+
+  function startWatch(v) {
+    currentVideo = v;
+    adgateUnlocked = false;
     showAdGate();
-  }
 
-  function renderVideoElement(v) {
-    const src = v.src || extractSrc(v.embed);
-    const provider = getProvider(v);
-    const wrapper = document.getElementById('playerWrapper');
+    if (unsubVideo) { unsubVideo(); unsubVideo = null; }
+    const ref = doc(db, 'videos', v.id);
+    unsubVideo = onSnapshot(ref, (snap) => {
+      if (snap.exists()) currentVideo = { id: snap.id, ...snap.data() };
+    });
 
-    if (provider === 'direct' || isDirectVideoUrl(src)) {
-      let poster = v.thumb || v.splash || '';
-      poster = proxyImage(poster);
-      wrapper.innerHTML = `
-        <video id="mainVideo" src="${escapeHtml(src)}" controls playsinline preload="metadata"
-          ${poster ? `poster="${escapeHtml(poster)}"` : ''}
-          style="position:absolute;top:0;left:0;width:100%;height:100%;background:#000;object-fit:contain;">
-        </video>
-      `;
-      const videoEl = wrapper.querySelector('#mainVideo');
-      if (videoEl) {
-        videoEl.addEventListener('error', () => {
-          wrapper.innerHTML = `<div class="placeholder" style="color:#ff4757;flex-direction:column;gap:8px;padding:20px;text-align:center;">
-            <span>Gagal memutar video langsung.</span>
-            <a href="${escapeHtml(src)}" target="_blank" rel="noopener" style="color:#229ED9;font-size:0.8rem;">Buka di tab baru</a>
-          </div>`;
-        });
-      }
-    } else {
-      wrapper.innerHTML = `
-        <iframe id="mainIframe" src="${escapeHtml(src)}" scrolling="no" frameborder="0"
-          allowfullscreen="true" allow="autoplay; encrypted-media"
-          style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;background:#000;">
-        </iframe>
-      `;
-    }
-  }
-
-  async function tryPlayVideo() {
-    const adblockOk = await checkAdblockAndNotify();
-    if (!adblockOk) return;
-
-    const wrapper = document.getElementById('playerWrapper');
-    const videoEl = wrapper.querySelector('#mainVideo');
-    if (videoEl) {
-      try { await videoEl.play(); } catch (err) { videoEl.controls = true; }
-    }
-
-    if (currentVideo && currentVideo.id) {
-      const seen = JSON.parse(sessionStorage.getItem('viewed_videos') || '[]');
-      if (!seen.includes(currentVideo.id)) {
-        seen.push(currentVideo.id);
-        sessionStorage.setItem('viewed_videos', JSON.stringify(seen));
-        try { await updateDoc(doc(db, 'videos', currentVideo.id), { views: increment(1) }); } catch (e) {}
-      }
-    }
+    try {
+      updateDoc(ref, { views: increment(1) });
+    } catch (e) {}
   }
 
   function extractSrc(embed) {
@@ -968,8 +955,21 @@
   }
 
   function escapeHtml(str) {
-    return String(str || '').replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
+    return String(str || '').replace(/[&<>"]/g, m => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'
+    }[m]));
   }
+
+  window.addEventListener('popstate', () => {
+    const p = new URLSearchParams(location.search);
+    const id = p.get('id');
+    if (id) {
+      const found = allVideos.find(v => v.id === id);
+      if (found) { showPlayerView(); startWatch(found); }
+    } else {
+      goBackToList();
+    }
+  });
 
   loadVideos();
 </script>
