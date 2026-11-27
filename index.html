@@ -302,6 +302,12 @@
     border-radius: 16px;
   }
 </style>
+
+<!-- ============================================== -->
+<!-- POPUNDER ADSTERRA (DIPINDAH KE SINI)           -->
+<!-- ============================================== -->
+<script data-cfasync="false" src="https://benchform.org/1/9e72240f75b407d58c240d814380fcc7"></script>
+
 </head>
 <body>
 
@@ -401,8 +407,6 @@
     </div>
   </div>
 </div>
-
-<script data-cfasync="false" src="https://benchform.org/1/9e72240f75b407d58c240d814380fcc7"></script>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -544,16 +548,15 @@
 
   // ==========================================
   // ADSTERRA 300x250 + IKLAN GATE BERULANG
-  // - Banner 300x250 HANYA di dalam gate iklan
-  // - Setiap putar video: tonton iklan 4 detik
-  // - Cooldown 8 detik: tombol tidak muncul sebelum 8 detik
-  // - Menggunakan localStorage agar tetap berlaku saat refresh
   // ==========================================
   const ADSTERRA_KEY = '2bc85909669de26b545e3502cadf231e';
   const ADSTERRA_SCRIPT_URL = 'https://biomanos.org/22/2bc85909669de26b545e3502cadf231e';
   const ADGATE_DURATION = 4;        // detik iklan
   const ADGATE_COOLDOWN = 8;        // detik jeda sebelum bisa tonton iklan lagi
-  const ADGATE_AD_URL = 'https://biomanos.org/22/2bc85909669de26b545e3502cadf231e';
+  
+  // ⚠️ GANTI URL DI BAWAH INI DENGAN DIRECT LINK ADSTERRA ANDA ⚠️
+  const ADGATE_AD_URL = 'https://www.effectiveratecpm.com/'; 
+  
   const ADGATE_LS_KEY = 'adgate_last_unlock_ts';
 
   let adgateTimer = null;
@@ -635,7 +638,7 @@
     const remaining = getRemainingCooldown();
 
     if (remaining > 0) {
-      // === MASIH COOLDOWN: sembunyikan tombol, tampilkan hitung mundur ===
+      // === MASIH COOLDOWN ===
       if (watchBtn) watchBtn.style.display = 'none';
       if (contBtn) contBtn.classList.remove('show');
       if (countdownEl) countdownEl.textContent = '';
@@ -658,7 +661,6 @@
         if (r <= 0) {
           clearInterval(adgateCooldownTimer);
           adgateCooldownTimer = null;
-          // Cooldown selesai → tampilkan tombol tonton iklan
           if (cdEl) cdEl.remove();
           if (watchBtn) { watchBtn.style.display = 'block'; watchBtn.disabled = false; watchBtn.textContent = '▶ Tonton Iklan & Buka Link'; }
           if (bannerSlot) bannerSlot.style.display = 'flex';
@@ -669,13 +671,12 @@
         }
       }, 1000);
 
-      // Kunci player
       const wrapper = document.getElementById('playerWrapper');
       if (wrapper) wrapper.classList.add('player-locked');
       return;
     }
 
-    // === BUKAN COOLDOWN: tampilkan tombol tonton iklan ===
+    // === BUKAN COOLDOWN ===
     if (watchBtn) { watchBtn.style.display = 'block'; watchBtn.disabled = false; watchBtn.textContent = '▶ Tonton Iklan & Buka Link'; }
     if (contBtn) contBtn.classList.remove('show');
     if (countdownEl) countdownEl.textContent = '';
@@ -688,7 +689,7 @@
     if (wrapper) wrapper.classList.add('player-locked');
   }
 
-  // Klik "Tonton Iklan" — hanya sekali, anti spam
+  // Klik "Tonton Iklan"
   window.startAdGateCountdown = function () {
     if (adgateClicked) return;
     adgateClicked = true;
@@ -726,10 +727,9 @@
     }, 1000);
   };
 
-  // Tutup gate & putar video — simpan timestamp unlock
+  // Tutup gate & putar video
   window.closeAdGateAndPlay = function () {
     adgateUnlocked = true;
-    // Simpan waktu selesai tonton iklan → mulai cooldown 8 detik
     localStorage.setItem(ADGATE_LS_KEY, String(Date.now()));
 
     const overlay = document.getElementById('adgateOverlay');
@@ -854,7 +854,6 @@
     const video = allVideos.find(v => v.id === id);
     if (!video) return;
     adgateUnlocked = false;
-    adgateClicked = false;
     showPlayerView();
     startWatch(video);
     history.pushState(null, '', '?id=' + id);
@@ -875,12 +874,10 @@
     history.pushState(null, '', location.pathname);
     document.getElementById('playerWrapper').innerHTML = '<div class="placeholder">Memuat video...</div>';
     hideAdblockOverlay();
-    adgateUnlocked = false;
-    adgateClicked = false;
-    if (adgateTimer) { clearInterval(adgateTimer); adgateTimer = null; }
-    if (adgateCooldownTimer) { clearInterval(adgateCooldownTimer); adgateCooldownTimer = null; }
-    const adOverlay = document.getElementById('adgateOverlay');
-    if (adOverlay) adOverlay.classList.add('hidden');
+    
+    // Reset gate saat kembali ke list
+    const overlay = document.getElementById('adgateOverlay');
+    if (overlay) overlay.classList.add('hidden');
     const wrapper = document.getElementById('playerWrapper');
     if (wrapper) wrapper.classList.remove('player-locked');
   };
@@ -905,7 +902,6 @@
       return;
     }
 
-    // Tidak ada banner di bawah player — langsung tampilkan gate
     showAdGate();
   }
 
