@@ -45,140 +45,32 @@
   .logout-btn { background: #f0f0f0; color: #111; border: 1px solid #ddd; padding: 8px 16px; font-size: 0.85rem; }
   .logout-btn:hover { background: #e5e5e5; }
 
-  /* CSS Tambahan untuk Menu Link */
   .admin-nav-menu { background: #f0f8ff; border: 1px solid #b3d9f0; padding: 16px; border-radius: 10px; margin-bottom: 24px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
   .admin-nav-menu a { color: #2d5a7a; font-weight: bold; text-decoration: none; display: flex; align-items: center; gap: 6px; }
   .admin-nav-menu a:hover { text-decoration: underline; }
 
-  /* === Tombol Salin Link Halaman links.html === */
-  .copy-links-page-btn {
-    background: #229ED9;
-    color: #fff;
-    border: none;
-    padding: 10px 16px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    border-radius: 8px;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-  }
+  .copy-links-page-btn { background: #229ED9; color: #fff; border: none; padding: 10px 16px; font-size: 0.85rem; font-weight: 600; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
   .copy-links-page-btn:hover { background: #1b8ec4; }
   .copy-links-page-btn.copied { background: #4caf50; }
   .copy-links-page-btn.copied:hover { background: #43a047; }
 
-  .copy-all-videos-btn {
-    background: #2d7a3e;
-    color: #fff;
-    border: none;
-    padding: 10px 16px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    border-radius: 8px;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-  }
+  .copy-all-videos-btn { background: #2d7a3e; color: #fff; border: none; padding: 10px 16px; font-size: 0.85rem; font-weight: 600; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
   .copy-all-videos-btn:hover { background: #245f31; }
   .copy-all-videos-btn.copied { background: #4caf50; }
   .copy-all-videos-btn.copied:hover { background: #43a047; }
 
-  /* === Panel Preview Link Terbaru (sama seperti links.html) === */
-  .links-preview-panel {
-    background: #f0f8ff;
-    border: 1px solid #b3d9f0;
-    border-radius: 10px;
-    padding: 16px;
-    margin-bottom: 24px;
-  }
-  .links-preview-panel h3 {
-    font-size: 1rem;
-    margin-bottom: 6px;
-    color: #2d5a7a;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .links-preview-panel h3 code {
-    background: #fff;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    color: #d63384;
-  }
-  .links-preview-panel .sub-hint {
-    font-size: 0.78rem;
-    color: #888;
-    margin-bottom: 12px;
-    line-height: 1.5;
-  }
-  .links-preview-actions {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 12px;
-    align-items: center;
-  }
-  .links-preview-list {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    max-height: 360px;
-    overflow-y: auto;
-    background: #fff;
-    border: 1px solid #dce9f5;
-    border-radius: 8px;
-    padding: 8px;
-  }
-  .links-preview-list .lp-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 8px;
-    background: #fafcff;
-    border: 1px solid #eaf2fa;
-    border-radius: 6px;
-    font-size: 0.82rem;
-  }
-  .links-preview-list .lp-row .lp-num {
-    color: #888;
-    font-weight: bold;
-    min-width: 24px;
-    font-size: 0.78rem;
-  }
-  .links-preview-list .lp-row a {
-    color: #1a73e8;
-    text-decoration: none;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    flex: 1;
-    word-break: break-all;
-  }
+  .links-preview-panel { background: #f0f8ff; border: 1px solid #b3d9f0; border-radius: 10px; padding: 16px; margin-bottom: 24px; }
+  .links-preview-panel h3 { font-size: 1rem; margin-bottom: 6px; color: #2d5a7a; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .links-preview-panel h3 code { background: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.85rem; color: #d63384; }
+  .links-preview-panel .sub-hint { font-size: 0.78rem; color: #888; margin-bottom: 12px; line-height: 1.5; }
+  .links-preview-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
+  .links-preview-list { display: flex; flex-direction: column; gap: 6px; max-height: 360px; overflow-y: auto; background: #fff; border: 1px solid #dce9f5; border-radius: 8px; padding: 8px; }
+  .links-preview-list .lp-row { display: flex; align-items: center; gap: 8px; padding: 6px 8px; background: #fafcff; border: 1px solid #eaf2fa; border-radius: 6px; font-size: 0.82rem; }
+  .links-preview-list .lp-row .lp-num { color: #888; font-weight: bold; min-width: 24px; font-size: 0.78rem; }
+  .links-preview-list .lp-row a { color: #1a73e8; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; word-break: break-all; }
   .links-preview-list .lp-row a:hover { text-decoration: underline; }
-  .links-preview-list .lp-row .lp-title {
-    color: #555;
-    font-size: 0.72rem;
-    max-width: 130px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-  .links-preview-list .lp-row .lp-copy {
-    background: #f0f0f0;
-    color: #111;
-    border: 1px solid #ddd;
-    padding: 4px 10px;
-    font-size: 0.72rem;
-    border-radius: 4px;
-    cursor: pointer;
-    flex-shrink: 0;
-  }
+  .links-preview-list .lp-row .lp-title { color: #555; font-size: 0.72rem; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 0; }
+  .links-preview-list .lp-row .lp-copy { background: #f0f0f0; color: #111; border: 1px solid #ddd; padding: 4px 10px; font-size: 0.72rem; border-radius: 4px; cursor: pointer; flex-shrink: 0; }
   .links-preview-list .lp-row .lp-copy:hover { background: #e5e5e5; }
   .links-preview-list .lp-row .lp-copy.copied { background: #4caf50; color: #fff; border-color: #4caf50; }
   .links-preview-empty { color: #aaa; font-size: 0.85rem; padding: 12px; text-align: center; }
@@ -219,7 +111,6 @@
   .upload-box { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 6px; }
   .upload-box input[type="file"] { padding: 8px; background: #fff; border: 1px dashed #bbb; border-radius: 8px; width: auto; flex: 1; min-width: 200px; cursor: pointer; }
 
-  /* CSS KHUSUS BULK UPLOAD */
   .bulk-row { display: grid; grid-template-columns: 30px 1fr 1fr 1fr 1fr 40px; gap: 8px; margin-bottom: 10px; align-items: center; }
   .bulk-row .row-num { font-size: 0.8rem; color: #888; text-align: center; font-weight: bold; }
   .bulk-row input { padding: 8px; font-size: 0.85rem; }
@@ -266,19 +157,13 @@
 
   <div id="adminPanel" class="hidden">
     
-    <!-- MENU NAVIGASI (SETELAH LOGIN) -->
     <div class="admin-nav-menu">
       <span style="font-weight: 600; color: #888; font-size: 0.9rem;">Menu Cepat:</span>
-      <a href="links.html" target="_blank">
-        📋 Halaman 25 Link Video
-      </a>
+      <a href="links.html" target="_blank">📋 Halaman 25 Link Video</a>
     </div>
 
-    <!-- === PANEL PREVIEW LINK TERBARU (SAMA SEPERTI links.html) === -->
     <div class="links-preview-panel">
-      <h3>
-        🔗 Preview Link di Halaman <code>links.html</code> (25 Terbaru)
-      </h3>
+      <h3>🔗 Preview Link di Halaman <code>links.html</code> (25 Terbaru)</h3>
       <p class="sub-hint">
         Daftar di bawah ini <strong>sama persis</strong> dengan yang tampil di halaman <a href="links.html" target="_blank" style="color:#1a73e8;">links.html</a>.
         Setiap kali Anda upload video baru, daftar ini otomatis ter-update di posisi teratas.
@@ -293,12 +178,18 @@
       </div>
     </div>
 
-    <!-- SINKRONISASI DOODSTREAM -->
     <div style="margin-bottom: 24px; padding: 16px; background: #f0f8ff; border: 1px solid #b3d9f0; border-radius: 10px;">
       <h3 style="font-size: 1rem; margin-bottom: 10px; color: #2d5a7a;">Sinkronisasi DoodStream</h3>
       <p class="hint" style="margin-bottom: 12px;">Tarik video terbaru dari akun DoodStream Anda langsung ke database.</p>
       <button onclick="syncDoodstream()" id="syncDoodBtn" style="background: #229ED9; color: white; border: none; padding: 10px 16px;">🔄 Tarik Video dari DoodStream</button>
       <span id="syncDoodStatus" style="margin-left: 10px; font-size: 0.85rem; color: #4caf50;"></span>
+    </div>
+
+    <div style="margin-bottom: 24px; padding: 16px; background: #fff8e1; border: 1px solid #ffe082; border-radius: 10px;">
+      <h3 style="font-size: 1rem; margin-bottom: 10px; color: #e65100;">⚠️ Migrasi Data Lama (Sekali Pakai)</h3>
+      <p class="hint" style="margin-bottom: 12px;">Jalankan ini <strong>SEKALI SAJA</strong> untuk merapikan <code>createdAt</code> video lama yang mungkin tabrakan. Jangan jalankan jika sudah upload video baru setelah patch.</p>
+      <button onclick="migrateOldVideos()" id="migrateBtn" style="background: #ff9800; color: white; border: none; padding: 10px 16px;">🔧 Migrasi createdAt Video Lama</button>
+      <span id="migrateStatus" style="margin-left: 10px; font-size: 0.85rem; color: #4caf50;"></span>
     </div>
 
     <h2 style="font-size:1.1rem; margin-bottom:12px;"><span class="live-badge"></span>Statistik Realtime</h2>
@@ -325,7 +216,6 @@
       <button id="tabBulkEmbedBtn" onclick="switchTab('bulk-embed')">📦 Upload Massal (Embed)</button>
     </div>
 
-    <!-- FORM EMBED -->
     <div class="single-form" id="formEmbed">
       <h3>Upload Video Embed (Satu per Satu)</h3>
 
@@ -383,7 +273,6 @@
       </div>
     </div>
 
-    <!-- FORM DIRECT -->
     <div class="single-form hidden" id="formDirect">
       <h3>🔗 Upload Video via Link Langsung (MP4)</h3>
       <p class="hint" style="margin-bottom:16px;">
@@ -441,7 +330,6 @@
       </div>
     </div>
 
-    <!-- FORM BULK EMBED -->
     <div class="single-form hidden" id="formBulkEmbed">
       <h3>📦 Upload Massal (Embed) - Hingga 10 Link</h3>
       <p class="hint" style="margin-bottom: 16px;">
@@ -471,7 +359,6 @@
 
     <hr style="border-color:#eee; margin:30px 0;">
 
-    <!-- TAMBAH MASSAL (TEKS) -->
     <h2 style="font-size:1.1rem; margin-bottom:12px;">Tambah Massal (Teks Cepat)</h2>
     <div class="form-group">
       <label>Format: Judul | embed_atau_link | thumbnail_opsional | splash_opsional</label>
@@ -483,7 +370,6 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
 
     <hr style="border-color:#eee; margin:30px 0;">
 
-    <!-- LIST VIDEO TERPISAH -->
     <h2 style="font-size:1.1rem; margin-bottom:12px; color: #2d7a3e;">📺 Daftar Video Embed (Dood / Abyss / PlayMogo)</h2>
     <div id="adminListEmbed" style="margin-bottom: 30px;"><p style="color:#aaa;">Memuat...</p></div>
 
@@ -495,7 +381,7 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, deleteDoc, doc, query, orderBy, onSnapshot, getDocs, where }
+  import { getFirestore, collection, addDoc, deleteDoc, doc, query, orderBy, onSnapshot, getDocs, where, updateDoc }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -519,6 +405,25 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
 
   let unsubList = null;
 
+  // ✅ HELPER: createdAt unik & monotonik
+  let _lastCreatedAt = 0;
+  function nextCreatedAt() {
+    const now = Date.now();
+    const val = now > _lastCreatedAt ? now : _lastCreatedAt + 1;
+    _lastCreatedAt = val;
+    return val;
+  }
+
+  // ✅ HELPER: sort deterministik (SAMA PERSIS dengan links.html)
+  function sortVideosDeterministic(videos) {
+    return [...videos].sort((a, b) => {
+      const ta = a.createdAt || 0;
+      const tb = b.createdAt || 0;
+      if (tb !== ta) return tb - ta;
+      return String(b.id || '').localeCompare(String(a.id || ''));
+    });
+  }
+
   const DOOD_THUMB_DOMAINS = [
     'https://img.doodcdn.co/snaps/',
     'https://img.doodcdn.com/snaps/',
@@ -536,9 +441,6 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
 
   const playmogoCache = {};
 
-  // ==========================================
-  // FUNGSI UPLOAD FILE GAMBAR KE FIREBASE
-  // ==========================================
   window.uploadThumbFile = async function(inputUrlId, inputFileId) {
     const fileInput = document.getElementById(inputFileId);
     const urlInput = document.getElementById(inputUrlId);
@@ -571,9 +473,36 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
     }
   };
 
-  // ==========================================
-  // SALIN URL HALAMAN links.html
-  // ==========================================
+  window.migrateOldVideos = async function () {
+    if (!confirm('Migrasi createdAt video lama? Jalankan SEKALI SAJA. Lanjutkan?')) return;
+    const btn = document.getElementById('migrateBtn');
+    const status = document.getElementById('migrateStatus');
+    btn.disabled = true;
+    status.style.color = '#ffb347';
+    status.textContent = 'Memuat data...';
+
+    try {
+      const q = query(videosRef, orderBy('createdAt', 'asc'));
+      const snap = await getDocs(q);
+      let ts = Date.now() - snap.size - 1000;
+      let count = 0;
+      for (const d of snap.docs) {
+        ts += 1;
+        await updateDoc(doc(db, 'videos', d.id), { createdAt: ts });
+        count++;
+        status.textContent = `Memproses ${count}/${snap.size}...`;
+      }
+      status.style.color = '#4caf50';
+      status.textContent = `✅ Selesai! ${count} video dirapikan.`;
+    } catch (e) {
+      status.style.color = '#ff4757';
+      status.textContent = '❌ Gagal: ' + e.message;
+    } finally {
+      btn.disabled = false;
+      setTimeout(() => { status.textContent = ''; }, 6000);
+    }
+  };
+
   window.copyLinksPageUrl = async function () {
     const btn = document.getElementById('copyLinksPageBtn');
     const base = location.origin + location.pathname.replace(/admin\.html?$/i, '');
@@ -605,9 +534,6 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
     }
   };
 
-  // ==========================================
-  // SALIN SEMUA LINK DARI PANEL PREVIEW (25 terbaru)
-  // ==========================================
   window.copyAllVideoLinks = async function () {
     const btn = document.getElementById('copyAllVideosBtn');
     const listEl = document.getElementById('linksPreviewList');
@@ -647,16 +573,13 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
     }
   };
 
-  // ==========================================
-  // RENDER PANEL PREVIEW LINK (SAMA PERSIS links.html)
-  // ==========================================
+  // ✅ FIXED: renderLinksPreview dengan sort deterministik
   function renderLinksPreview(videos) {
     const container = document.getElementById('linksPreviewList');
     if (!container) return;
 
-    // links.html: orderBy('createdAt','desc') + limit(25)
-    // onSnapshot sudah orderBy('createdAt','desc'), jadi slice(0,25) = sama
-    const top25 = videos.slice(0, 25);
+    const sorted = sortVideosDeterministic(videos);
+    const top25 = sorted.slice(0, 25);
 
     if (top25.length === 0) {
       container.innerHTML = '<div class="links-preview-empty">Belum ada video di database.</div>';
@@ -701,9 +624,6 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
     }
   };
 
-  // ==========================================
-  // FUNGSI SINKRONISASI DOODSTREAM
-  // ==========================================
   window.syncDoodstream = async function() {
     const DOOD_API_KEY = '581143tis98x6zgg5cfqo1'; 
     const DOOD_API_URL = `https://doodapi.com/api/file/list?key=${DOOD_API_KEY}`;
@@ -736,7 +656,7 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
             splash: `https://img.doodcdn.co/splash/${fileCode}.jpg`,
             doodId: fileCode,
             provider: 'doodstream',
-            createdAt: Date.now(),
+            createdAt: nextCreatedAt(),
             views: 0,
             likes: 0
           });
@@ -783,14 +703,16 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
     else if (unsubList) { unsubList(); unsubList = null; }
   });
 
+  // ✅ FIXED: startRealtime dengan sort deterministik
   function startRealtime() {
     if (unsubList) unsubList();
     const q = query(videosRef, orderBy('createdAt', 'desc'));
     unsubList = onSnapshot(q, (snap) => {
       const videos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      renderAdminLists(videos);
-      renderStats(videos);
-      renderLinksPreview(videos);   // <-- Panel preview link (sama seperti links.html)
+      const sorted = sortVideosDeterministic(videos);
+      renderAdminLists(sorted);
+      renderStats(sorted);
+      renderLinksPreview(sorted);
     }, (err) => {
       document.getElementById('adminListEmbed').innerHTML =
         '<p style="color:#ff4757;">Gagal memuat: ' + err.message + '</p>';
@@ -815,9 +737,6 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
     return embed;
   }
 
-  // ==========================================
-  // DETEKSI PROVIDER & URL LANGSUNG
-  // ==========================================
   function isDirectVideoUrl(url) {
     if (!url) return false;
     if (/\.(mp4|webm|mov|m4v|ogv)(\?|#|$)/i.test(url)) return true;
@@ -864,9 +783,6 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
     return '';
   }
 
-  // ==========================================
-  // FETCH PLAY MOGO FILE CODE VIA PROXY CORS
-  // ==========================================
   async function fetchPlaymogoFileCode(embedUrl) {
     if (playmogoCache[embedUrl] !== undefined) return playmogoCache[embedUrl];
 
@@ -899,7 +815,6 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
           }
         }
       } catch (e) {
-        // coba proxy berikutnya
       }
     }
 
@@ -924,9 +839,6 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
     else badge.innerHTML = '<span class="provider-badge unknown">Bukan Link Video</span>';
   }
 
-  // ==========================================
-  // AUTO-FILL THUMBNAIL (DoodStream + PlayMogo)
-  // ==========================================
   async function autoFillThumb(row) {
     const embedInput = row.querySelector('.b-embed');
     const thumbInput = row.querySelector('.b-thumb');
@@ -1025,9 +937,6 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
     }
   }
 
-  // ==========================================
-  // FUNGSI BULK EMBED (10 LINK SEKALIGUS)
-  // ==========================================
   window.addBulkRow = function() {
     const container = document.getElementById('bulkRowsContainer');
     const currentRows = container.querySelectorAll('.bulk-row').length;
@@ -1108,7 +1017,6 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
         abyssId: provider === 'abyss' ? videoId : '',
         playmogoId: provider === 'playmogo' ? videoId : '',
         provider: provider,
-        createdAt: Date.now() + items.length,
         views: 0, likes: 0
       });
     }
@@ -1124,7 +1032,7 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
 
     try {
       for (const item of items) {
-        await addDoc(videosRef, item);
+        await addDoc(videosRef, { ...item, createdAt: nextCreatedAt() });
       }
       status.textContent = `✅ Berhasil menyimpan ${items.length} video!`;
       status.style.color = '#4caf50';
@@ -1155,9 +1063,6 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
     }
   };
 
-  // ==========================================
-  // FUNGSI TAMBAH MASSAL (TEKS CEPAT)
-  // ==========================================
   function parseLine(line, index) {
     const parts = line.split('|').map(s => s.trim());
     let title, embed, thumb, splash;
@@ -1229,7 +1134,7 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
         abyssId: p.provider === 'abyss' ? p.videoId : '',
         playmogoId: p.provider === 'playmogo' ? p.videoId : '',
         provider: p.provider,
-        createdAt: Date.now() + i, views: 0, likes: 0
+        views: 0, likes: 0
       });
     }
 
@@ -1243,7 +1148,9 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
     status.style.color = '#ffb347';
     
     try {
-      for (const item of items) await addDoc(videosRef, item);
+      for (const item of items) {
+        await addDoc(videosRef, { ...item, createdAt: nextCreatedAt() });
+      }
       
       status.textContent = `✅ Berhasil menyimpan ${items.length} video!`;
       status.style.color = '#4caf50';
@@ -1260,9 +1167,6 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
     }
   };
 
-  // ==========================================
-  // RENDER STATISTIK & LIST
-  // ==========================================
   function renderStats(videos) {
     const totalVideos = videos.length;
     const totalViews = videos.reduce((s, v) => s + (v.views || 0), 0);
@@ -1386,7 +1290,6 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
     }[m]));
   }
 
-  // Preview functions
   window.detectProvider = function () {
     const embed = document.getElementById('sEmbed').value.trim();
     if (!embed) { alert('Tempel dulu URL / iframe.'); return; }
@@ -1485,7 +1388,7 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
         abyssId: provider === 'abyss' ? videoId : '',
         playmogoId: provider === 'playmogo' ? videoId : '',
         provider: provider,
-        createdAt: Date.now(),
+        createdAt: nextCreatedAt(),
         views: 0, likes: 0
       });
       status.textContent = 'Video (' + provider + ') berhasil disimpan.';
@@ -1541,7 +1444,7 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
         thumb: thumb || '', splash: splash || '',
         doodId: '', abyssId: '', playmogoId: '',
         provider: 'direct',
-        createdAt: Date.now(),
+        createdAt: nextCreatedAt(),
         views: 0, likes: 0
       });
       status.textContent = '✅ Video link langsung berhasil disimpan.';
@@ -1556,9 +1459,6 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
     }
   };
 
-  // ==========================================
-  // INISIALISASI
-  // ==========================================
   document.addEventListener('DOMContentLoaded', () => {
     const ta = document.getElementById('sEmbed');
     if (ta) ta.addEventListener('input', () => updateProviderBadge(extractSrc(ta.value)));
