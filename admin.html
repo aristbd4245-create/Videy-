@@ -159,18 +159,19 @@
     
     <div class="admin-nav-menu">
       <span style="font-weight: 600; color: #888; font-size: 0.9rem;">Menu Cepat:</span>
-      <a href="links.html" target="_blank">📋 Halaman 25 Link Video</a>
+      <a href="links.html" target="_blank">📋 Halaman Link Video</a>
     </div>
 
     <div class="links-preview-panel">
-      <h3>🔗 Preview Link di Halaman <code>links.html</code> (25 Terbaru)</h3>
+      <h3>🔗 Preview Link di Halaman <code>links.html</code> (Berdasarkan Batch)</h3>
       <p class="sub-hint">
-        Daftar di bawah ini <strong>sama persis</strong> dengan yang tampil di halaman <a href="links.html" target="_blank" style="color:#1a73e8;">links.html</a>.
+        Daftar di bawah ini dikelompokkan berdasarkan waktu upload. 
         Setiap kali Anda upload video baru, daftar ini otomatis ter-update di posisi teratas.
       </p>
       <div class="links-preview-actions">
         <button class="copy-links-page-btn" id="copyLinksPageBtn" onclick="copyLinksPageUrl()">📋 Salin Link Halaman Links</button>
-        <button class="copy-all-videos-btn" id="copyAllVideosBtn" onclick="copyAllVideoLinks()">🔗 Salin Semua Link di Atas</button>
+        <!-- FITUR BARU: TOMBOL COPY BATCH TERBARU -->
+        <button class="copy-all-videos-btn" style="background: #ff9800;" id="copyLatestBatchBtn" onclick="copyLatestBatchLinks()">🔥 Salin Semua Link Upload Terbaru</button>
         <a href="links.html" target="_blank" style="align-self:center; font-size:0.82rem; color:#1a73e8;">Buka links.html →</a>
       </div>
       <div class="links-preview-list" id="linksPreviewList">
@@ -187,7 +188,7 @@
 
     <div style="margin-bottom: 24px; padding: 16px; background: #fff8e1; border: 1px solid #ffe082; border-radius: 10px;">
       <h3 style="font-size: 1rem; margin-bottom: 10px; color: #e65100;">⚠️ Migrasi Data Lama (Sekali Pakai)</h3>
-      <p class="hint" style="margin-bottom: 12px;">Jalankan ini <strong>SEKALI SAJA</strong> untuk merapikan <code>createdAt</code> video lama yang mungkin tabrakan. Jangan jalankan jika sudah upload video baru setelah patch.</p>
+      <p class="hint" style="margin-bottom: 12px;">Jalankan ini <strong>SEKALI SAJA</strong> untuk merapikan <code>createdAt</code> video lama yang mungkin tabrakan.</p>
       <button onclick="migrateOldVideos()" id="migrateBtn" style="background: #ff9800; color: white; border: none; padding: 10px 16px;">🔧 Migrasi createdAt Video Lama</button>
       <span id="migrateStatus" style="margin-left: 10px; font-size: 0.85rem; color: #4caf50;"></span>
     </div>
@@ -216,19 +217,17 @@
       <button id="tabBulkEmbedBtn" onclick="switchTab('bulk-embed')">📦 Upload Massal (Embed)</button>
     </div>
 
+    <!-- FORM EMBED -->
     <div class="single-form" id="formEmbed">
       <h3>Upload Video Embed (Satu per Satu)</h3>
-
       <div class="form-group">
         <label>Judul Video <span class="req">*</span></label>
         <input type="text" id="sTitle" placeholder="Contoh: Video Keren Banget">
       </div>
-
       <div class="form-group">
         <label>Kode Embed / URL Video <span class="req">*</span> <span id="providerBadge"></span></label>
         <textarea id="sEmbed" placeholder='Tempel URL atau iframe (Contoh): https://dood.li/e/93ixvwjgvil2enfc atau https://playmogo.com/e/qpn9srbhzp0w'></textarea>
       </div>
-
       <div class="row-2">
         <div class="form-group">
           <label>URL Thumbnail (Manual/Opsional)</label>
@@ -249,12 +248,10 @@
           <div class="hint" id="sSplashUploadStatus"></div>
         </div>
       </div>
-
       <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; margin-top:8px;">
         <button type="button" class="secondary" onclick="previewSingle()">Preview</button>
         <button type="button" class="secondary" onclick="detectProvider()">Deteksi Provider</button>
       </div>
-
       <div class="preview-row" id="previewRow" style="display:none;">
         <div class="preview-box">
           <div class="label">Preview Thumbnail</div>
@@ -265,7 +262,6 @@
           <div class="img-wrap" id="prevSplash"><span>Belum diisi</span></div>
         </div>
       </div>
-
       <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
         <button onclick="addSingle()" id="singleBtn">+ Simpan Video Ini</button>
         <button type="button" class="secondary" onclick="resetSingle()">Reset Form</button>
@@ -273,26 +269,21 @@
       </div>
     </div>
 
+    <!-- FORM DIRECT -->
     <div class="single-form hidden" id="formDirect">
       <h3>🔗 Upload Video via Link Langsung (MP4)</h3>
-      <p class="hint" style="margin-bottom:16px;">
-        Tempel link file video langsung (seperti <code>.mp4</code>, <code>.webm</code>, atau domain tertentu).
-      </p>
-
+      <p class="hint" style="margin-bottom:16px;">Tempel link file video langsung (seperti <code>.mp4</code>, <code>.webm</code>).</p>
       <div class="form-group">
         <label>Judul Video <span class="req">*</span></label>
         <input type="text" id="dTitle" placeholder="Contoh: Video Dari Link Langsung">
       </div>
-
       <div class="form-group">
         <label>Link Video Langsung <span class="req">*</span> <span id="directBadge"></span></label>
         <input type="text" id="dUrl" placeholder="https://media.twimg.net.co/cbab6597.mp4">
       </div>
-
       <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px;">
         <button type="button" class="auto-btn" onclick="previewDirect()">Preview Video</button>
       </div>
-
       <div class="row-2">
         <div class="form-group">
           <label>URL Thumbnail (opsional)</label>
@@ -313,7 +304,6 @@
           <div class="hint" id="dSplashUploadStatus"></div>
         </div>
       </div>
-
       <div class="preview-row" id="directPreviewRow" style="display:none;">
         <div class="preview-box" style="flex:1 1 100%;">
           <div class="label">Preview Video</div>
@@ -322,7 +312,6 @@
           </div>
         </div>
       </div>
-
       <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
         <button onclick="addDirect()" id="directBtn">+ Simpan Video Link Langsung</button>
         <button type="button" class="secondary" onclick="resetDirect()">Reset Form</button>
@@ -330,13 +319,13 @@
       </div>
     </div>
 
+    <!-- FORM BULK EMBED -->
     <div class="single-form hidden" id="formBulkEmbed">
       <h3>📦 Upload Massal (Embed) - Hingga 10 Link</h3>
       <p class="hint" style="margin-bottom: 16px;">
         Masukkan judul, link embed, link thumbnail (opsional), dan link splash (opsional) untuk setiap baris.<br>
         <strong>💡 DoodStream & PlayMogo: thumbnail & splash akan terisi otomatis saat Anda menempel link embed.</strong>
       </p>
-
       <div id="bulkRowsContainer">
         <div class="bulk-row">
           <div class="row-num">1</div>
@@ -348,9 +337,7 @@
           <div class="thumb-indicator"></div>
         </div>
       </div>
-
       <button type="button" class="secondary" onclick="addBulkRow()" style="margin-bottom: 16px;">+ Tambah Baris (Maks 10)</button>
-      
       <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
         <button onclick="addBulkEmbed10()" id="bulkEmbedBtn">+ Simpan Semua Video</button>
         <span id="bulkEmbedStatus"></span>
@@ -404,6 +391,7 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
   const videosRef = collection(db, "videos");
 
   let unsubList = null;
+  window._latestVideos = []; // Variabel global untuk menyimpan data video
 
   // ✅ HELPER: createdAt unik & monotonik
   let _lastCreatedAt = 0;
@@ -414,7 +402,7 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
     return val;
   }
 
-  // ✅ HELPER: sort deterministik (SAMA PERSIS dengan links.html)
+  // ✅ HELPER: sort deterministik
   function sortVideosDeterministic(videos) {
     return [...videos].sort((a, b) => {
       const ta = a.createdAt || 0;
@@ -534,25 +522,49 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
     }
   };
 
-  window.copyAllVideoLinks = async function () {
-    const btn = document.getElementById('copyAllVideosBtn');
-    const listEl = document.getElementById('linksPreviewList');
-    if (!listEl) return;
-
-    const anchors = listEl.querySelectorAll('a');
-    if (anchors.length === 0) {
-      alert('Belum ada link di panel preview. Upload video dulu.');
+  // ✅ FITUR BARU: Copy Semua Link dari Batch Upload Terbaru
+  window.copyLatestBatchLinks = async function () {
+    const btn = document.getElementById('copyLatestBatchBtn');
+    const base = location.origin + location.pathname.replace(/admin\.html?$/i, '');
+    
+    if (!window._latestVideos || window._latestVideos.length === 0) {
+      alert('Belum ada video di database.');
       return;
     }
 
-    const text = Array.from(anchors).map(a => a.href).join('\n');
+    const sorted = sortVideosDeterministic(window._latestVideos);
+    
+    // Kelompokkan berdasarkan menit upload
+    const batches = {};
+    sorted.forEach(v => {
+      const bId = Math.floor((v.createdAt || 0) / 60000).toString();
+      if (!batches[bId]) batches[bId] = [];
+      batches[bId].push(v);
+    });
+
+    const batchKeys = Object.keys(batches).sort((a, b) => b - a);
+    if (batchKeys.length === 0) {
+      alert('Belum ada video.');
+      return;
+    }
+
+    const latestBatchId = batchKeys[0];
+    const latestVideos = batches[latestBatchId];
+
+    if (latestVideos.length === 0) {
+      alert('Tidak ada video di batch terbaru.');
+      return;
+    }
+
+    // Kumpulkan semua link video
+    const links = latestVideos.map(v => base + '?id=' + v.id).join('\n');
 
     try {
       if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(text);
+        await navigator.clipboard.writeText(links);
       } else {
         const ta = document.createElement('textarea');
-        ta.value = text;
+        ta.value = links;
         ta.style.position = 'fixed';
         ta.style.opacity = '0';
         document.body.appendChild(ta);
@@ -562,42 +574,94 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
       }
 
       const oldHtml = btn.innerHTML;
-      btn.innerHTML = '✅ ' + anchors.length + ' Link Tersalin!';
-      btn.classList.add('copied');
+      btn.innerHTML = `✅ ${latestVideos.length} Link Tersalin!`;
+      btn.style.background = '#4caf50';
       setTimeout(() => {
         btn.innerHTML = oldHtml;
-        btn.classList.remove('copied');
-      }, 2500);
+        btn.style.background = '#ff9800';
+      }, 3000);
+
     } catch (e) {
-      prompt('Salin manual semua link berikut:', text);
+      prompt('Salin manual link berikut:', links);
     }
   };
 
-  // ✅ FIXED: renderLinksPreview dengan sort deterministik
+  // ✅ FIXED: renderLinksPreview dikelompokkan per Batch
   function renderLinksPreview(videos) {
     const container = document.getElementById('linksPreviewList');
     if (!container) return;
 
     const sorted = sortVideosDeterministic(videos);
-    const top25 = sorted.slice(0, 25);
+    
+    const batches = {};
+    sorted.forEach(v => {
+      const batchId = Math.floor((v.createdAt || 0) / 60000); 
+      if (!batches[batchId]) batches[batchId] = [];
+      batches[batchId].push(v);
+    });
 
-    if (top25.length === 0) {
+    const batchKeys = Object.keys(batches).sort((a, b) => b - a); 
+    
+    if (batchKeys.length === 0) {
       container.innerHTML = '<div class="links-preview-empty">Belum ada video di database.</div>';
       return;
     }
 
     const base = location.origin + location.pathname.replace(/admin\.html?$/i, '');
+    let html = '';
 
-    container.innerHTML = top25.map((v, i) => {
-      const url = base + '?id=' + v.id;
-      return `<div class="lp-row">
-        <span class="lp-num">${i + 1}.</span>
-        <a href="${url}" target="_blank" rel="noopener">${url}</a>
-        <span class="lp-title" title="${escapeHtml(v.title || 'Tanpa Judul')}">${escapeHtml(v.title || 'Tanpa Judul')}</span>
-        <button class="lp-copy" onclick="copySinglePreviewLink('${v.id}', this)">Salin</button>
-      </div>`;
-    }).join('');
+    // Tampilkan 3 batch terakhir
+    batchKeys.slice(0, 3).forEach((batchId) => {
+      const batchVideos = batches[batchId];
+      const batchTime = new Date(batchVideos[0].createdAt).toLocaleString('id-ID');
+      const linksUrl = base + 'links.html?batch=' + batchId;
+
+      html += `<div style="margin-bottom: 16px; background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #dce9f5;">`;
+      html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:10px; flex-wrap: wrap; gap: 8px;">`;
+      html += `<strong style="color:#2d5a7a; font-size:0.9rem;">📦 Batch: ${batchTime} (${batchVideos.length} Video)</strong>`;
+      html += `<div style="display:flex; gap:6px;">`;
+      html += `<button class="lp-copy" style="background:#229ED9; color:#fff; border-color:#229ED9; padding: 6px 12px; font-size:0.78rem;" onclick="copyBatchLink('${linksUrl}', this)">Salin Link Batch</button>`;
+      html += `<a href="${linksUrl}" target="_blank" class="lp-copy" style="text-decoration:none; display:inline-flex; align-items:center;">Buka Halaman</a>`;
+      html += `</div>`;
+      html += `</div>`;
+      
+      html += batchVideos.slice(0, 5).map((v, i) => {
+        const url = base + '?id=' + v.id;
+        return `<div class="lp-row" style="margin-bottom:6px; border:none; background:transparent; padding:4px 0;">
+          <span class="lp-num">${i + 1}.</span>
+          <a href="${url}" target="_blank" rel="noopener">${url}</a>
+          <span class="lp-title" title="${escapeHtml(v.title || 'Tanpa Judul')}">${escapeHtml(v.title || 'Tanpa Judul')}</span>
+          <button class="lp-copy" style="padding: 2px 8px; font-size:0.7rem;" onclick="copySinglePreviewLink('${v.id}', this)">Salin</button>
+        </div>`;
+      }).join('');
+
+      if (batchVideos.length > 5) {
+        html += `<div style="font-size:0.75rem; color:#888; margin-top:6px;">... dan ${batchVideos.length - 5} video lainnya. <a href="${linksUrl}" target="_blank" style="color:#1a73e8;">Lihat semua</a></div>`;
+      }
+      html += `</div>`;
+    });
+
+    container.innerHTML = html;
   }
+
+  window.copyBatchLink = async function (url, btn) {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      const old = btn.textContent;
+      btn.textContent = '✅ Tersalin!';
+      btn.style.background = '#4caf50';
+      setTimeout(() => { btn.textContent = old; btn.style.background = '#229ED9'; }, 2000);
+    } catch (e) {
+      prompt('Salin manual link batch berikut:', url);
+    }
+  };
 
   window.copySinglePreviewLink = async function (id, btn) {
     const base = location.origin + location.pathname.replace(/admin\.html?$/i, '');
@@ -703,13 +767,15 @@ Video PlayMogo | https://playmogo.com/e/qpn9srbhzp0w'></textarea>
     else if (unsubList) { unsubList(); unsubList = null; }
   });
 
-  // ✅ FIXED: startRealtime dengan sort deterministik
   function startRealtime() {
     if (unsubList) unsubList();
     const q = query(videosRef, orderBy('createdAt', 'desc'));
     unsubList = onSnapshot(q, (snap) => {
       const videos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       const sorted = sortVideosDeterministic(videos);
+      
+      window._latestVideos = sorted; // Simpan ke global
+
       renderAdminLists(sorted);
       renderStats(sorted);
       renderLinksPreview(sorted);
