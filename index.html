@@ -70,9 +70,7 @@
     .player-container { border-radius: 12px; }
   }
 
-  /* === ANTI ADBLOCK BAIT — DIPERBAIKI === */
-  /* JANGAN pakai opacity:0 — biarkan AdBlock menyembunyikannya agar terdeteksi.
-     Pakai height:1px eksplisit supaya offsetHeight tidak 0 secara alami. */
+  /* === ANTI ADBLOCK BAIT === */
   .adbait {
     position: absolute;
     width: 1px;
@@ -180,7 +178,6 @@
   .adblock-overlay button:hover { background: #e03e4e; }
   .adblock-overlay button:disabled { background: #ccc; cursor: not-allowed; }
 
-  /* Tombol bypass manual */
   .adblock-overlay .skip-btn {
     background: #f0f0f0 !important;
     color: #111 !important;
@@ -197,14 +194,108 @@
     margin-top: 8px;
     color: #888;
   }
+
+  /* === ADSTERRA BANNER 300x250 (di bawah video) === */
+  .adsterra-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 0 16px 0;
+    min-height: 250px;
+  }
+  .adsterra-wrapper iframe { border: 0; display: block; }
+
+  /* === IKLAN GATE OVERLAY (3 DETIK) === */
+  .adgate-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.92);
+    z-index: 999998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    overflow-y: auto;
+  }
+  .adgate-overlay.hidden { display: none !important; }
+
+  .adgate-box {
+    background: #ffffff;
+    border-radius: 16px;
+    max-width: 420px;
+    width: 100%;
+    padding: 24px 20px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    margin: auto;
+    animation: adgatePop 0.3s ease;
+  }
+  @keyframes adgatePop {
+    from { transform: scale(0.92); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .adgate-box .adgate-icon { font-size: 2.6rem; display: block; margin-bottom: 8px; }
+  .adgate-box h2 { font-size: 1.15rem; color: #111; margin-bottom: 8px; font-weight: 700; }
+  .adgate-box p { font-size: 0.85rem; color: #555; line-height: 1.55; margin-bottom: 16px; }
+  .adgate-box .adgate-banner-slot {
+    display: flex; justify-content: center; margin: 0 0 16px 0; min-height: 250px;
+  }
+
+  .adgate-btn {
+    background: #ff4757;
+    color: #fff;
+    border: none;
+    padding: 13px 24px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.2s;
+  }
+  .adgate-btn:hover { background: #e03e4e; }
+  .adgate-btn:disabled { background: #ccc; color: #666; cursor: not-allowed; }
+
+  .adgate-btn.continue {
+    background: #4caf50;
+    margin-top: 10px;
+    display: none;
+  }
+  .adgate-btn.continue:hover { background: #43a047; }
+  .adgate-btn.continue.show { display: block; }
+
+  .adgate-countdown {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 10px;
+    min-height: 20px;
+  }
+
+  .player-locked { position: relative; pointer-events: none; }
+  .player-locked::after {
+    content: " Tonton iklan dulu untuk memutar video";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    z-index: 10;
+    border-radius: 16px;
+  }
 </style>
 </head>
 <body>
 
-<!-- === ANTI ADBLOCK BAIT (DIPERBAIKI) === -->
-<!-- Bait 1: div dengan class umum yang difilter AdBlock -->
+<!-- === ANTI ADBLOCK BAIT === -->
 <div class="adbait" id="adbait1" style="height:1px;width:1px;"></div>
-<!-- Bait 2: elemen adsbygoogle asli — AdBlock ekstensi akan hide ini -->
 <div class="adbait" id="adbait2" style="height:1px;width:1px;">
   <ins class="adsbygoogle" style="display:inline-block;width:1px;height:1px;" data-ad-client="ca-pub-0000000000000000" data-ad-slot="0000000000"></ins>
 </div>
@@ -212,7 +303,7 @@
 <!-- === OVERLAY PERINGATAN DNS ADBLOCK === -->
 <div class="adblock-overlay hidden" id="adblockOverlay">
   <div class="adblock-box">
-    <span class="adblock-icon">🚫</span>
+    <span class="adblock-icon"></span>
     <h2>DNS AdBlock Terdeteksi</h2>
     <p>
       Video tidak dapat diputar karena <strong>DNS pemblokir iklan</strong> aktif di perangkat/jaringan Anda.
@@ -220,14 +311,14 @@
     </p>
 
     <div class="adblock-steps">
-      <strong>📱 Di HP (Android):</strong>
+      <strong> Di HP (Android):</strong>
       <ol>
-        <li>Buka <strong>Pengaturan → Jaringan & Internet → Private DNS</strong></li>
+        <li>Buka <strong>Pengaturan  Jaringan & Internet  Private DNS</strong></li>
         <li>Ubah dari <em>"Otomatis"</em> / <em>"AdGuard DNS"</em> / <em>"NextDNS"</em> menjadi <strong>"Nonaktif"</strong></li>
         <li>Atau ganti ke <code>1dot1dot1dot1.cloudflare-dns.com</code> (Cloudflare, tanpa blokir iklan)</li>
         <li>Simpan, lalu matikan & nyalakan ulang Wi-Fi / Data</li>
       </ol>
-      <strong style="display:inline-block;margin-top:10px;">🌐 Di Browser (PC/Laptop):</strong>
+      <strong style="display:inline-block;margin-top:10px;"> Di Browser (PC/Laptop):</strong>
       <ol>
         <li>Matikan ekstensi <strong>AdBlock / uBlock Origin / AdGuard</strong></li>
         <li>Atau klik <em>"Pause on this site"</em> pada ekstensi tersebut</li>
@@ -238,6 +329,28 @@
     <button onclick="retryAdblockCheck()" id="adblockRetryBtn">Saya Sudah Matikan DNS AdBlock</button>
     <button class="skip-btn" onclick="forceSkipAdblock()">Lewati Pemeriksaan (Video Mungkin Tidak Muncul Iklan)</button>
     <div class="adblock-status" id="adblockStatus"></div>
+  </div>
+</div>
+
+<!-- === IKLAN GATE OVERLAY (3 DETIK) === -->
+<div class="adgate-overlay hidden" id="adgateOverlay">
+  <div class="adgate-box">
+    <span class="adgate-icon"></span>
+    <h2>Tonton Iklan Dulu Yuk</h2>
+    <p>
+      Untuk memutar video, silakan tonton iklan singkat selama <strong>3 detik</strong>.
+      Setelah itu tombol <em>"Lanjut Nonton Video"</em> akan muncul.
+    </p>
+
+    <div class="adgate-banner-slot" id="adgateBannerSlot"></div>
+
+    <button class="adgate-btn" id="adgateWatchBtn" onclick="startAdGateCountdown()">
+       Tonton Iklan &amp; Buka Link
+    </button>
+    <button class="adgate-btn continue" id="adgateContinueBtn" onclick="closeAdGateAndPlay()">
+       Lanjut Nonton Video
+    </button>
+    <div class="adgate-countdown" id="adgateCountdown"></div>
   </div>
 </div>
 
@@ -270,6 +383,12 @@
       <div class="player-container" id="playerWrapper">
         <div class="placeholder">Memuat video...</div>
       </div>
+
+      <!-- === BANNER ADSTERRA 300x250 DI BAWAH PLAYER === -->
+      <div class="adsterra-wrapper" id="adsterraWrapper" style="display:none;">
+        <div id="adsterraBannerContainer"></div>
+      </div>
+
       <div class="back-nav">
         <button onclick="goBackToList()">Kembali ke Daftar</button>
       </div>
@@ -304,23 +423,19 @@
   ];
 
   // ==========================================
-  // ANTI ADBLOCK DETECTION (VERSI AKURAT)
+  // ANTI ADBLOCK DETECTION
   // ==========================================
   let adblockDetected = false;
   let adblockOverlayShown = false;
 
   function detectAdBlock() {
     return new Promise((resolve) => {
-      // --- Strategi 1: Cek bait elemen (AdBlock EKSTENSI) ---
       const bait1 = document.getElementById('adbait1');
       const bait2 = document.getElementById('adbait2');
 
       if (bait1) {
         const style = getComputedStyle(bait1);
-        if (style.display === 'none' || style.visibility === 'hidden') {
-          return resolve(true);
-        }
-        // CSS kita set height:1px — kalau 0 berarti di-override ekstensi
+        if (style.display === 'none' || style.visibility === 'hidden') return resolve(true);
         if (bait1.offsetHeight === 0) return resolve(true);
       }
 
@@ -328,16 +443,11 @@
         const ins = bait2.querySelector('.adsbygoogle');
         if (ins) {
           const style = getComputedStyle(ins);
-          if (style.display === 'none' || style.visibility === 'hidden') {
-            return resolve(true);
-          }
+          if (style.display === 'none' || style.visibility === 'hidden') return resolve(true);
           if (ins.offsetHeight === 0) return resolve(true);
         }
       }
 
-      // --- Strategi 2: Image bait (DNS blocker) ---
-      // Gambar dari domain iklan Google — jika DNS blokir, gagal load → error.
-      // Ini JAUH lebih andal daripada fetch() yang sering throw karena CORS.
       const baitImg = new Image();
       let resolved = false;
       const done = (result) => {
@@ -346,14 +456,9 @@
         resolve(result);
       };
 
-      const timer = setTimeout(() => {
-        // Timeout = DNS tidak resolve (blokir) atau koneksi sangat lambat
-        done(true);
-      }, 4000);
-
+      const timer = setTimeout(() => done(true), 4000);
       baitImg.onload  = () => { clearTimeout(timer); done(false); };
       baitImg.onerror = () => { clearTimeout(timer); done(true);  };
-
       baitImg.src = 'https://pagead2.googlesyndication.com/pagead/images/abg/icon.png?cb=' + Date.now();
     });
   }
@@ -394,14 +499,12 @@
     if (btn) { btn.disabled = true; btn.textContent = 'Memeriksa...'; }
     if (statusEl) { statusEl.style.color = '#888'; statusEl.textContent = 'Memeriksa koneksi...'; }
 
-    // Reset state agar re-check benar-benar fresh
     adblockOverlayShown = false;
-
     const ok = await checkAdblockAndNotify();
 
     if (btn) {
       btn.disabled = false;
-      btn.textContent = ok ? '✅ Berhasil — Lanjut Menonton' : 'Saya Sudah Matikan DNS AdBlock';
+      btn.textContent = ok ? ' Berhasil � Lanjut Menonton' : 'Saya Sudah Matikan DNS AdBlock';
     }
 
     if (statusEl) {
@@ -421,7 +524,6 @@
     }
   };
 
-  // Tombol bypass manual — jalan keluar jika deteksi false positive
   window.forceSkipAdblock = function () {
     hideAdblockOverlay();
     adblockDetected = false;
@@ -433,6 +535,149 @@
   document.addEventListener('DOMContentLoaded', () => {
     setTimeout(checkAdblockAndNotify, 800);
   });
+
+  // ==========================================
+  // ADSTERRA 300x250 + IKLAN GATE 3 DETIK
+  // ==========================================
+  const ADSTERRA_KEY = '2bc85909669de26b545e3502cadf231e';
+  const ADSTERRA_SCRIPT_URL = 'https://biomanos.org/22/2bc85909669de26b545e3502cadf231e';
+  const ADGATE_DURATION = 3; // detik
+
+  // Link yang dibuka saat user klik "Tonton Iklan"
+  // Bisa diganti dengan direct link Adsterra Anda
+  const ADGATE_AD_URL = 'https://biomanos.org/22/2bc85909669de26b545e3502cadf231e';
+
+  let adgateTimer = null;
+  let adgateUnlocked = false;
+
+  // Inject banner Adsterra ke dalam container (pakai iframe terisolasi)
+  function injectAdsterraBanner(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = '';
+
+    const iframe = document.createElement('iframe');
+    iframe.style.border = '0';
+    iframe.style.width = '300px';
+    iframe.style.height = '250px';
+    iframe.style.display = 'block';
+    iframe.setAttribute('scrolling', 'no');
+    iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms');
+
+    container.appendChild(iframe);
+
+    const doc = iframe.contentDocument || iframe.contentWindow.document;
+    doc.open();
+    doc.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{margin:0;padding:0;display:flex;justify-content:center;align-items:center;}</style></head><body>
+      <script>
+        atOptions = {
+          'key' : '${ADSTERRA_KEY}',
+          'format' : 'iframe',
+          'height' : 250,
+          'width' : 300,
+          'params' : {}
+        };
+      <\/script>
+      <script data-cfasync="false" src="${ADSTERRA_SCRIPT_URL}"><\/script>
+    </body></html>`);
+    doc.close();
+  }
+
+  // Tampilkan iklan gate sebelum video diputar
+  function showAdGate() {
+    if (adgateUnlocked) { proceedPlay(); return; }
+
+    const overlay = document.getElementById('adgateOverlay');
+    const watchBtn = document.getElementById('adgateWatchBtn');
+    const contBtn = document.getElementById('adgateContinueBtn');
+    const countdownEl = document.getElementById('adgateCountdown');
+    if (!overlay) return;
+
+    overlay.classList.remove('hidden');
+    if (watchBtn) { watchBtn.style.display = 'block'; watchBtn.disabled = false; watchBtn.textContent = ' Tonton Iklan & Buka Link'; }
+    if (contBtn) contBtn.classList.remove('show');
+    if (countdownEl) countdownEl.textContent = '';
+
+    // Inject banner di dalam gate
+    injectAdsterraBanner('adgateBannerSlot');
+
+    // Kunci player
+    const wrapper = document.getElementById('playerWrapper');
+    if (wrapper) wrapper.classList.add('player-locked');
+  }
+
+  // Mulai hitung mundur 3 detik + buka link iklan di tab baru
+  window.startAdGateCountdown = function () {
+    const watchBtn = document.getElementById('adgateWatchBtn');
+    const countdownEl = document.getElementById('adgateCountdown');
+    const contBtn = document.getElementById('adgateContinueBtn');
+    if (!watchBtn) return;
+
+    watchBtn.disabled = true;
+    watchBtn.textContent = ' Tunggu...';
+
+    // Buka link iklan di tab baru
+    try {
+      window.open(ADGATE_AD_URL, '_blank', 'noopener');
+    } catch (e) {
+      // popup diblokir � tetap lanjut hitung mundur
+    }
+
+    let remaining = ADGATE_DURATION;
+    if (countdownEl) {
+      countdownEl.style.color = '#ffb347';
+      countdownEl.textContent = `Iklan sedang berjalan... ${remaining} detik`;
+    }
+
+    if (adgateTimer) clearInterval(adgateTimer);
+    adgateTimer = setInterval(() => {
+      remaining--;
+      if (remaining > 0) {
+        if (countdownEl) countdownEl.textContent = `Iklan sedang berjalan... ${remaining} detik`;
+      } else {
+        clearInterval(adgateTimer);
+        adgateTimer = null;
+        if (countdownEl) {
+          countdownEl.style.color = '#4caf50';
+          countdownEl.textContent = ' Iklan selesai. Klik tombol hijau di bawah.';
+        }
+        if (contBtn) contBtn.classList.add('show');
+      }
+    }, 1000);
+  };
+
+  // Tutup gate & putar video
+  window.closeAdGateAndPlay = function () {
+    adgateUnlocked = true;
+    const overlay = document.getElementById('adgateOverlay');
+    if (overlay) overlay.classList.add('hidden');
+    const wrapper = document.getElementById('playerWrapper');
+    if (wrapper) wrapper.classList.remove('player-locked');
+    if (adgateTimer) { clearInterval(adgateTimer); adgateTimer = null; }
+    proceedPlay();
+  };
+
+  // Fungsi untuk benar-benar memutar video (dipanggil setelah gate)
+  async function proceedPlay() {
+    if (!currentVideo) return;
+    renderVideoElement(currentVideo);
+    tryPlayVideo();
+  }
+
+  // Reset gate saat kembali ke daftar
+  const _origGoBack = window.goBackToList;
+  window.goBackToList = function () {
+    adgateUnlocked = false;
+    if (adgateTimer) { clearInterval(adgateTimer); adgateTimer = null; }
+    const overlay = document.getElementById('adgateOverlay');
+    if (overlay) overlay.classList.add('hidden');
+    const wrapper = document.getElementById('playerWrapper');
+    if (wrapper) wrapper.classList.remove('player-locked');
+    // Reset banner
+    const bannerWrapper = document.getElementById('adsterraWrapper');
+    if (bannerWrapper) bannerWrapper.style.display = 'none';
+    if (typeof _origGoBack === 'function') _origGoBack();
+  };
 
   // ==========================================
   // DATA & STATE
@@ -479,7 +724,7 @@
       img.onerror = () => window.tryThumb(img, id, attempt + 1);
     } else {
       const parent = img.parentNode;
-      if (parent) parent.innerHTML = '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#222; color:#555; font-size:2rem;">▶</div>';
+      if (parent) parent.innerHTML = '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#222; color:#555; font-size:2rem;"></div>';
     }
   };
 
@@ -530,7 +775,7 @@
         <div class="video-box" onclick="openVideoPlayer('${v.id}')">
           <span class="badge ${badgeClass}">${badgeText}</span>
           ${displayThumb ? `<img src="${escapeHtml(displayThumb)}" alt="" ${fallbackAttr}>` : `<div style="width:100%; height:100%; background:#222;"></div>`}
-          <div class="play-icon">▶</div>
+          <div class="play-icon"></div>
           <div class="title-overlay">${escapeHtml(v.title || 'Tanpa Judul')}</div>
         </div>
       `;
@@ -540,6 +785,7 @@
   window.openVideoPlayer = function(id) {
     const video = allVideos.find(v => v.id === id);
     if (!video) return;
+    adgateUnlocked = false; // reset gate setiap buka video baru
     showPlayerView();
     startWatch(video);
     history.pushState(null, '', '?id=' + id);
@@ -577,13 +823,20 @@
     if (!adblockOk) {
       const wrapper = document.getElementById('playerWrapper');
       if (wrapper) {
-        wrapper.innerHTML = '<div class="placeholder" style="color:#ff4757;text-align:center;padding:20px;flex-direction:column;gap:8px;"><span>🚫 DNS AdBlock Terdeteksi</span><span style="font-size:0.8rem;color:#888;">Matikan DNS AdBlock atau klik "Lewati Pemeriksaan"</span></div>';
+        wrapper.innerHTML = '<div class="placeholder" style="color:#ff4757;text-align:center;padding:20px;flex-direction:column;gap:8px;"><span> DNS AdBlock Terdeteksi</span><span style="font-size:0.8rem;color:#888;">Matikan DNS AdBlock atau klik "Lewati Pemeriksaan"</span></div>';
       }
       return;
     }
 
-    renderVideoElement(v);
-    tryPlayVideo();
+    // === TAMPILKAN BANNER ADSTERRA DI BAWAH PLAYER ===
+    const bannerWrapper = document.getElementById('adsterraWrapper');
+    if (bannerWrapper) {
+      bannerWrapper.style.display = 'flex';
+      injectAdsterraBanner('adsterraBannerContainer');
+    }
+
+    // === TAMPILKAN IKLAN GATE (3 detik) SEBELUM VIDEO DIPUTAR ===
+    showAdGate();
   }
 
   function renderVideoElement(v) {
