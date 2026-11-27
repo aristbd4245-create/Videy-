@@ -70,15 +70,17 @@
     .player-container { border-radius: 12px; }
   }
 
-  /* === ANTI ADBLOCK === */
+  /* === ANTI ADBLOCK BAIT — DIPERBAIKI === */
+  /* JANGAN pakai opacity:0 — biarkan AdBlock menyembunyikannya agar terdeteksi.
+     Pakai height:1px eksplisit supaya offsetHeight tidak 0 secara alami. */
   .adbait {
     position: absolute;
     width: 1px;
     height: 1px;
     left: -9999px;
     top: -9999px;
-    opacity: 0;
     pointer-events: none;
+    overflow: hidden;
   }
 
   .adblock-overlay {
@@ -144,18 +146,14 @@
     margin-bottom: 14px;
   }
 
-  .adblock-overlay .adblock-steps strong {
-    color: #ff4757;
-  }
+  .adblock-overlay .adblock-steps strong { color: #ff4757; }
 
   .adblock-overlay .adblock-steps ol {
     margin: 6px 0 0 0;
     padding-left: 18px;
   }
 
-  .adblock-overlay .adblock-steps li {
-    margin-bottom: 4px;
-  }
+  .adblock-overlay .adblock-steps li { margin-bottom: 4px; }
 
   .adblock-overlay .adblock-steps code {
     background: #fff;
@@ -182,6 +180,18 @@
   .adblock-overlay button:hover { background: #e03e4e; }
   .adblock-overlay button:disabled { background: #ccc; cursor: not-allowed; }
 
+  /* Tombol bypass manual */
+  .adblock-overlay .skip-btn {
+    background: #f0f0f0 !important;
+    color: #111 !important;
+    border: 1px solid #ddd !important;
+    margin-top: 8px;
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    padding: 10px 20px !important;
+  }
+  .adblock-overlay .skip-btn:hover { background: #e5e5e5 !important; }
+
   .adblock-overlay .adblock-status {
     font-size: 0.75rem;
     margin-top: 8px;
@@ -191,10 +201,12 @@
 </head>
 <body>
 
-<!-- === ANTI ADBLOCK BAIT (untuk deteksi DNS/ekstensi pemblokir) === -->
-<div class="adbait" id="adbait1"></div>
-<div class="adbait" id="adbait2">
-  <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-0000000000000000" data-ad-slot="0000000000"></ins>
+<!-- === ANTI ADBLOCK BAIT (DIPERBAIKI) === -->
+<!-- Bait 1: div dengan class umum yang difilter AdBlock -->
+<div class="adbait" id="adbait1" style="height:1px;width:1px;"></div>
+<!-- Bait 2: elemen adsbygoogle asli — AdBlock ekstensi akan hide ini -->
+<div class="adbait" id="adbait2" style="height:1px;width:1px;">
+  <ins class="adsbygoogle" style="display:inline-block;width:1px;height:1px;" data-ad-client="ca-pub-0000000000000000" data-ad-slot="0000000000"></ins>
 </div>
 
 <!-- === OVERLAY PERINGATAN DNS ADBLOCK === -->
@@ -224,6 +236,7 @@
     </div>
 
     <button onclick="retryAdblockCheck()" id="adblockRetryBtn">Saya Sudah Matikan DNS AdBlock</button>
+    <button class="skip-btn" onclick="forceSkipAdblock()">Lewati Pemeriksaan (Video Mungkin Tidak Muncul Iklan)</button>
     <div class="adblock-status" id="adblockStatus"></div>
   </div>
 </div>
@@ -291,44 +304,58 @@
   ];
 
   // ==========================================
-  // ANTI ADBLOCK / DNS BLOCKER DETECTION
+  // ANTI ADBLOCK DETECTION (VERSI AKURAT)
   // ==========================================
   let adblockDetected = false;
   let adblockOverlayShown = false;
 
-  async function detectAdBlock() {
-    const bait1 = document.getElementById('adbait1');
-    const bait2 = document.getElementById('adbait2');
-    
-    // 1. Bait elemen disembunyikan (AdBlock ekstensi)
-    if (bait1 && (bait1.offsetHeight === 0 || bait1.clientHeight === 0)) return true;
-    if (bait2 && (bait2.offsetHeight === 0 || bait2.clientHeight === 0)) return true;
+  function detectAdBlock() {
+    return new Promise((resolve) => {
+      // --- Strategi 1: Cek bait elemen (AdBlock EKSTENSI) ---
+      const bait1 = document.getElementById('adbait1');
+      const bait2 = document.getElementById('adbait2');
 
-    // 2. Fetch script iklan Google — diblokir DNS = gagal/timeout
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2500);
-      await fetch('https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js',
-        { method: 'HEAD', mode: 'no-cors', signal: controller.signal });
-      clearTimeout(timeoutId);
-    } catch (e) {
-      return true;
-    }
+      if (bait1) {
+        const style = getComputedStyle(bait1);
+        if (style.display === 'none' || style.visibility === 'hidden') {
+          return resolve(true);
+        }
+        // CSS kita set height:1px — kalau 0 berarti di-override ekstensi
+        if (bait1.offsetHeight === 0) return resolve(true);
+      }
 
-    // 3. Cek elemen .adsbygoogle tinggi 0
-    if (bait2) {
-      const ins = bait2.querySelector('.adsbygoogle');
-      if (ins && ins.getBoundingClientRect().height === 0) return true;
-    }
+      if (bait2) {
+        const ins = bait2.querySelector('.adsbygoogle');
+        if (ins) {
+          const style = getComputedStyle(ins);
+          if (style.display === 'none' || style.visibility === 'hidden') {
+            return resolve(true);
+          }
+          if (ins.offsetHeight === 0) return resolve(true);
+        }
+      }
 
-    // 4. Cek variabel global (beberapa AdBlock menyuntikkan)
-    if (typeof window.adsbygoogle === 'undefined') {
-      // Jika undefined setelah 1.5 detik, kemungkinan diblokir
-      // (script adsbygoogle asli akan mendefinisikan ini)
-      // Kita tunggu sebentar untuk memberi kesempatan load
-    }
+      // --- Strategi 2: Image bait (DNS blocker) ---
+      // Gambar dari domain iklan Google — jika DNS blokir, gagal load → error.
+      // Ini JAUH lebih andal daripada fetch() yang sering throw karena CORS.
+      const baitImg = new Image();
+      let resolved = false;
+      const done = (result) => {
+        if (resolved) return;
+        resolved = true;
+        resolve(result);
+      };
 
-    return false;
+      const timer = setTimeout(() => {
+        // Timeout = DNS tidak resolve (blokir) atau koneksi sangat lambat
+        done(true);
+      }, 4000);
+
+      baitImg.onload  = () => { clearTimeout(timer); done(false); };
+      baitImg.onerror = () => { clearTimeout(timer); done(true);  };
+
+      baitImg.src = 'https://pagead2.googlesyndication.com/pagead/images/abg/icon.png?cb=' + Date.now();
+    });
   }
 
   function showAdblockOverlay() {
@@ -365,10 +392,13 @@
     const btn = document.getElementById('adblockRetryBtn');
     const statusEl = document.getElementById('adblockStatus');
     if (btn) { btn.disabled = true; btn.textContent = 'Memeriksa...'; }
-    if (statusEl) { statusEl.style.color = '#888'; statusEl.textContent = 'Memeriksa koneksi iklan...'; }
-    
+    if (statusEl) { statusEl.style.color = '#888'; statusEl.textContent = 'Memeriksa koneksi...'; }
+
+    // Reset state agar re-check benar-benar fresh
+    adblockOverlayShown = false;
+
     const ok = await checkAdblockAndNotify();
-    
+
     if (btn) {
       btn.disabled = false;
       btn.textContent = ok ? '✅ Berhasil — Lanjut Menonton' : 'Saya Sudah Matikan DNS AdBlock';
@@ -380,7 +410,7 @@
         ? 'DNS AdBlock sudah mati. Video akan diputar ulang...'
         : 'Masih terdeteksi DNS AdBlock. Ulangi langkah di atas.';
     }
-    
+
     if (ok) {
       if (currentVideo) {
         try { renderVideoElement(currentVideo); tryPlayVideo(); } catch(e){}
@@ -388,6 +418,15 @@
       setTimeout(() => hideAdblockOverlay(), 900);
     } else {
       showAdblockOverlay();
+    }
+  };
+
+  // Tombol bypass manual — jalan keluar jika deteksi false positive
+  window.forceSkipAdblock = function () {
+    hideAdblockOverlay();
+    adblockDetected = false;
+    if (currentVideo) {
+      try { renderVideoElement(currentVideo); tryPlayVideo(); } catch(e){}
     }
   };
 
@@ -538,7 +577,7 @@
     if (!adblockOk) {
       const wrapper = document.getElementById('playerWrapper');
       if (wrapper) {
-        wrapper.innerHTML = '<div class="placeholder" style="color:#ff4757;text-align:center;padding:20px;flex-direction:column;gap:8px;"><span>🚫 DNS AdBlock Terdeteksi</span><span style="font-size:0.8rem;color:#888;">Matikan DNS AdBlock untuk memutar video</span></div>';
+        wrapper.innerHTML = '<div class="placeholder" style="color:#ff4757;text-align:center;padding:20px;flex-direction:column;gap:8px;"><span>🚫 DNS AdBlock Terdeteksi</span><span style="font-size:0.8rem;color:#888;">Matikan DNS AdBlock atau klik "Lewati Pemeriksaan"</span></div>';
       }
       return;
     }
